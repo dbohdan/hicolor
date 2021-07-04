@@ -282,8 +282,6 @@ hicolor_result hicolor_quantize_rgb(
     *quant_error_g = (int8_t)((int16_t) rgb.g - (int16_t) quant_rgb->g);
     *quant_error_b = (int8_t)((int16_t) rgb.b - (int16_t) quant_rgb->b);
 
-    fprintf(stderr, "err %i %i %i\n", *quant_error_r,*quant_error_g,*quant_error_b);
-
     return HICOLOR_OK;
 }
 
