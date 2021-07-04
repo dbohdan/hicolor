@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#define HICOLOR_LIBRARY_VERSION 1
+#define HICOLOR_LIBRARY_VERSION 100
 
 /* Types. */
 
