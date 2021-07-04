@@ -1,0 +1,103 @@
+#! /usr/bin/env tclsh
+
+package require Tcl 8.6-10
+package require tcltest
+
+cd [file dirname [info script]]
+
+set hicolorCommand ../hicolor
+if {[info exists env(HICOLOR_COMMAND)]} {
+    set hicolorCommand $env(HICOLOR_COMMAND)
+}
+
+proc hicolor args {
+    exec {*}$::hicolorCommand {*}$args
+}
+
+proc read-file path {
+    try {
+        set ch [open $path rb]
+        read $ch
+    } finally {
+        close $ch
+    }
+}
+
+
+tcltest::test version-1.1 {} -body {
+    hicolor version
+} -match regexp -result {\d+\.\d+\.\d+}
+
+
+tcltest::test help-1.1 {} -body {
+    hicolor help 2>@1
+} -match glob -result usage:*
+
+
+tcltest::test encode-1.1 {} -body {
+    hicolor encode
+} -returnCodes error -match glob -result {*too few arg*}
+
+tcltest::test encode-1.2 {} -body {
+    hicolor encode photo.png
+} -result {}
+
+tcltest::test encode-1.3 {} -body {
+    hicolor encode photo.png photo.png.hic
+} -result {}
+
+tcltest::test encode-2.1 {encode flags} -body {
+    hicolor encode -5 photo.png photo.png.hic
+    hicolor info photo.png.hic
+} -result {5 640 427}
+
+tcltest::test encode-2.2 {encode flags} -body {
+    hicolor encode --15-bit photo.png photo.png.hic
+    hicolor info photo.png.hic
+} -result {5 640 427}
+
+tcltest::test encode-2.3 {encode flags} -body {
+    hicolor encode -6 photo.png photo.png.hic
+    hicolor info photo.png.hic
+} -result {6 640 427}
+
+tcltest::test encode-2.4 {encode flags} -body {
+    hicolor encode --16-bit photo.png photo.png.hic
+    hicolor info photo.png.hic
+} -result {6 640 427}
+
+tcltest::test encode-2.5 {encode flags} -body {
+    hicolor encode --16-bit photo.png
+    hicolor info photo.png.hic
+} -result {6 640 427}
+
+
+hicolor encode --15-bit photo.png photo.hi5
+hicolor encode --16-bit photo.png photo.hi6
+
+tcltest::test decode-1.1 {15-bit} -body {
+    hicolor decode photo.hi5
+    file exists photo.hi5.png
+} -result 1
+
+tcltest::test decode-1.2 {16-bit} -body {
+    hicolor decode photo.hi6
+    file exists photo.hi6.png
+} -result 1
+
+
+tcltest::test data-integrity-1.1 {roundtrip} -body {
+    hicolor decode photo.hi5 temp.png
+    hicolor encode -5 temp.png temp.hi5
+    set f1 [read-file photo.hi5]
+    set f2 [read-file temp.hi5]
+    expr { $f1 eq $f2 }
+} -result 1
+
+
+incr failed [expr {$tcltest::numTests(Failed) > 0}]
+tcltest::cleanupTests
+
+if {$failed > 0} {
+    exit 1
+}

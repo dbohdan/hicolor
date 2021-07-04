@@ -17,4 +17,7 @@ install-bin: hicolor
 install-include: picol.h
 	install -m 0644 $< $(DESTDIR)$(PREFIX)/include
 
-.PHONY: all clean install-bin install-include
+test: all
+	./tests/hicolor.test
+
+.PHONY: all clean install-bin install-include tests
