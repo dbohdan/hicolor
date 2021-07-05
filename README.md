@@ -68,7 +68,7 @@ sudo apt install -y build-essential gcc-mingw-w64-i686
 make hicolor.exe
 # Wine, Tcl, and GraphicsMagick are needed only for testing.
 sudo apt install -y graphicsmagick tclsh wine
-make test 'HICOLOR_COMMAND=wine ../hicolor.exe'
+make test-wine
 ```
 
 ## License
