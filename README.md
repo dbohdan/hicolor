@@ -6,6 +6,8 @@ HiColor is a program for converting images to 15- and 16-bit RGB color, the colo
 
 I wrote this program because I wanted to create images with the characteristic high-color look, and nothing seemed to support high color.  It implements its own simple [file format](format.md) and converts between this format and PNG.  To reduce the quantization error (the difference between the original and the high-color pixel), it uses the period-appropriate [Bayer ordered dithering](https://bisqwit.iki.fi/story/howto/dither/jy/#StandardOrderedDitheringAlgorithm) algorithm.  Dithering can be disabled with a command line flag.  HiColor files have the extension `.hic` or `.hi5` for 15-bit and `.hi6` for 16-bit.
 
+Quantized images compress better when thier originals, so HiColor may be used as a less-lossy alternative to the 256-color [pngquant](https://pngquant.org/).  However, unlike pngquant, it does not preserve transparency.
+
 The program is written in C with minimal dependencies and builds as a static binary by default.  It works at least on Linux and Windows 7.
 
 ## Known bugs and limitations
