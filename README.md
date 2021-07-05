@@ -1,12 +1,12 @@
 # HiColor
 
-![A building with a dithered gradient of the sky behind it.](building-15bit.png)
+![A building with a dithered gradient of the sky behind it.  A jet airplane is taking off in the sky.](bordeaux-15bit.png)
 
-HiColor is a program for converting images to 15- and 16-bit RGB color, the color depth of old display modes known as ["high color"](https://en.wikipedia.org/wiki/High_color).  In 15-bit mode images have 5 bits for each of red, green, and blue, and the last bit is reserved.  In 16-bit mode green, the color the human eye is generally most sensitive to, gets 6 bits.
+HiColor is a program for converting images to 15- and 16-bit RGB color, the color depth of old display modes known as [&ldquo;high color&rdquo;](https://en.wikipedia.org/wiki/High_color).  In 15-bit mode images have 5 bits for each of red, green, and blue, and the last bit is reserved.  In 16-bit mode green, the color the human eye is generally most sensitive to, gets 6 bits.
 
-I wrote this program because I wanted to create images with the characteristic high-color look, and nothing seemed to support high color.  It implements its own simple [file format](format.md) and converts between this format and PNG.  To reduce the quantization error (the difference between the original and the high-color pixel), it uses the period-appropriate [Bayer ordered dithering](https://bisqwit.iki.fi/story/howto/dither/jy/#StandardOrderedDitheringAlgorithm) algorithm.  Dithering can be disabled with a command line flag.  HiColor files have the extension `.hic` or `.hi5` for 15-bit and `.hi6` for 16-bit.
+I wrote this program because I wanted to create images with the characteristic high-color look, and nothing seemed to support high color.  It implements its own simple [file format](format.md) and converts between this format and PNG.  It can also convert normal PNG to normal 32-bit PNG with only high color color values.  (This simulates a roundtrip through HiColor without creating a temporary file.)  To reduce the quantization error (the difference between the original and the high-color pixel), HiColor uses the period-appropriate [Bayer ordered dithering](https://bisqwit.iki.fi/story/howto/dither/jy/#StandardOrderedDitheringAlgorithm) algorithm.  Dithering can be disabled with a command line flag.  HiColor files have the extension `.hic` or `.hi5` for 15-bit and `.hi6` for 16-bit.
 
-Quantized images compress better when thier originals, so HiColor may be used as a less-lossy alternative to the 256-color [pngquant](https://pngquant.org/).  However, unlike pngquant, it does not preserve transparency.
+Quantized images compress better when their originals, so HiColor may serve as a less-lossy alternative to the 256-color [pngquant](https://pngquant.org/).  However, unlike pngquant, it does not preserve transparency.
 
 The program is written in C with minimal dependencies and builds as a static binary by default.  It works at least on Linux and Windows 7.
 
@@ -18,7 +18,7 @@ PNG files HiColor produces are unoptimized.  Run them through [OptiPNG](http://o
 
 ### Generation loss
 
-Right now repeated conversion to `.hic` and repeated quantization cause (capped) [generation loss](https://en.wikipedia.org/wiki/Generation_loss) when dithering is enabled (by default).  There is no such generation loss without the dithering.  I am not sure whether to fix this or to keep it for artistic use.  The effect looks pretty cool on color high-contrast anime-style images, making them resemble [PC-98](https://en.wikipedia.org/wiki/PC-9800_series) art.  The example below illustrates a best-case scenario.  It converged (stopped changing) after 100 generations.  Most anime images won't look this good.
+Right now repeated conversion to `.hic` and repeated quantization cause (capped) [generation loss](https://en.wikipedia.org/wiki/Generation_loss) when dithering is enabled (by default).  There is no such generation loss without the dithering.  I am not sure whether to fix this or to keep it for artistic use.  I think the effect looks cool on colorful high-contrast anime-style images, making them resemble [PC-98](https://en.wikipedia.org/wiki/PC-9800_series) art.  The example below illustrates a best-case scenario.  It converged (stopped changing) after 100 generations.  Most anime images won't look this good.
 
 ![An example of color generation loss with HiColor](https://i.imgur.com/FpLRyE4.png)
 
@@ -79,7 +79,7 @@ MIT.
 
 ### Photos from Unsplash
 
-[Building photo from Bordeaux](https://unsplash.com/photos/AwtncJT1qKs) (`building-15bit.png`) by olaf wisser.
+[Building photo with a plane from Bordeaux](https://unsplash.com/photos/AwtncJT1qKs) (`bordeaux-15bit.png`) by olaf wisser.
 
 [NYC photo](https://unsplash.com/photos/bucV25NA6gI) (`nyc-15bit-gen-100.png`) by Phi Tran.
 
