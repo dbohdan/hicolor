@@ -5,11 +5,24 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#define HICOLOR_BAYER_SIZE 8
 #define HICOLOR_LIBRARY_VERSION 100
 
 /* Types. */
 
-const uint8_t hicolor_magic[7] = "HiColor";
+static const uint8_t hicolor_magic[7] = "HiColor";
+
+static const double hicolor_bayer[HICOLOR_BAYER_SIZE * HICOLOR_BAYER_SIZE] = {
+     0.0/64, 48.0/64, 12.0/64, 60.0/64,  3.0/64, 51.0/64, 15.0/64, 63.0/64,
+    32.0/64, 16.0/64, 44.0/64, 28.0/64, 35.0/64, 19.0/64, 47.0/64, 31.0/64,
+     8.0/64, 56.0/64,  4.0/64, 52.0/64, 11.0/64, 59.0/64,  7.0/64, 55.0/64,
+    40.0/64, 24.0/64, 36.0/64, 20.0/64, 43.0/64, 27.0/64, 39.0/64, 23.0/64,
+     2.0/64, 50.0/64, 14.0/64, 62.0/64,  1.0/64, 49.0/64, 13.0/64, 61.0/64,
+    34.0/64, 18.0/64, 46.0/64, 30.0/64, 33.0/64, 17.0/64, 45.0/64, 29.0/64,
+    10.0/64, 58.0/64,  6.0/64, 54.0/64,  9.0/64, 57.0/64,  5.0/64, 53.0/64,
+    42.0/64, 26.0/64, 38.0/64, 22.0/64, 41.0/64, 25.0/64, 37.0/64, 21.0/64
+};
+
 
 typedef enum hicolor_version {
     HICOLOR_VERSION_5,
@@ -72,17 +85,10 @@ hicolor_result hicolor_write_header(
     const hicolor_metadata meta
 );
 
-hicolor_result hicolor_quantize_rgb(
-    const hicolor_metadata meta,
-    const hicolor_rgb rgb,
-    hicolor_rgb* quant_rgb,
-    int8_t* quant_error_r,
-    int8_t* quant_error_g,
-    int8_t* quant_error_b
-);
-/* Quantize with Floyd-Steinberg dithering. */
+/* Quantize using ordered (Bayer) dithering. */
 hicolor_result hicolor_quantize_rgb_image(
     const hicolor_metadata meta,
+    bool dither,
     hicolor_rgb* image
 );
 
@@ -98,6 +104,8 @@ hicolor_result hicolor_write_rgb_image(
 );
 
 #endif /* HICOLOR_H */
+
+/* -------------------------------------------------------------------------- */
 
 #ifdef HICOLOR_IMPLEMENTATION
 
@@ -135,7 +143,7 @@ hicolor_result hicolor_char_to_version(
         return HICOLOR_OK;
     default:
         return HICOLOR_UNKNOWN_VERSION;
-    };    
+    };
 }
 
 
@@ -160,7 +168,8 @@ hicolor_result hicolor_value_to_rgb(
     const hicolor_version version,
     const hicolor_value value,
     hicolor_rgb* rgb
-){
+)
+{
     switch (version) {
     case HICOLOR_VERSION_5:
         rgb->r = (value & 0x1f) << 3;
@@ -186,7 +195,7 @@ hicolor_result hicolor_rgb_to_value(
     switch (version) {
     case HICOLOR_VERSION_5:
         *value = (rgb.r >> 3) | (rgb.g >> 3 << 5) | (rgb.b >> 3 << 10);
-        return HICOLOR_OK;        
+        return HICOLOR_OK;
     case HICOLOR_VERSION_6:
         *value = (rgb.r >> 3) | (rgb.g >> 2 << 5) | (rgb.b >> 3 << 11);
         return HICOLOR_OK;
@@ -256,86 +265,80 @@ hicolor_result hicolor_write_header(
     return HICOLOR_IO_ERROR;
 }
 
-hicolor_result hicolor_quantize_rgb(
-    const hicolor_metadata meta,
+
+void hicolor_bayerize_rgb(
+    hicolor_version version,
+    uint16_t x,
+    uint16_t y,
     const hicolor_rgb rgb,
-    hicolor_rgb* quant_rgb,
-    int8_t* quant_error_r,
-    int8_t* quant_error_g,
-    int8_t* quant_error_b
-) {
-    hicolor_result res;
-    hicolor_value value;
+    hicolor_rgb* output
+)
+{
+    uint8_t bayer_coord =
+        (y % HICOLOR_BAYER_SIZE) * HICOLOR_BAYER_SIZE +
+        x % HICOLOR_BAYER_SIZE;
+    double factor = hicolor_bayer[bayer_coord];
 
-    res = hicolor_rgb_to_value(meta.version, rgb, &value);
-    if (res != HICOLOR_OK) {
-        return res;
-    }
+    double threshold = 8.0;
+    double threshold_g = version == HICOLOR_VERSION_5 ? threshold : 4.0;
 
-    res = hicolor_value_to_rgb(meta.version, value, quant_rgb);
-    if (res != HICOLOR_OK) {
-        return res;
-    }
+    double r = (double) rgb.r + factor * threshold;
+    if (r < 0) r = 0;
+    if (r > 255) r = 255;
 
-    /* abs(quant_error_?) < 8 */
-    *quant_error_r = (int8_t)((int16_t) rgb.r - (int16_t) quant_rgb->r);
-    *quant_error_g = (int8_t)((int16_t) rgb.g - (int16_t) quant_rgb->g);
-    *quant_error_b = (int8_t)((int16_t) rgb.b - (int16_t) quant_rgb->b);
+    double g = (double) rgb.g + factor * threshold_g;
+    if (g < 0) g = 0;
+    if (g > 255) g = 255;
 
-    return HICOLOR_OK;
+    double b = (double) rgb.b + factor * threshold;
+    if (b < 0) b = 0;
+    if (b > 255) b = 255;
+
+    output->r = (uint8_t) r;
+    output->g = (uint8_t) g;
+    output->b = (uint8_t) b;
 }
 
-#define HICOLOR_2D(X, Y) ((Y) * meta.width + (X))
 hicolor_result hicolor_quantize_rgb_image(
     const hicolor_metadata meta,
+    bool dither,
     hicolor_rgb* image
 )
 {
-    hicolor_rgb quant_rgb;
-    int8_t quant_error_r, quant_error_g, quant_error_b;
+    hicolor_rgb rgb;
+    hicolor_value value;
 
     for (uint16_t y = 0; y < meta.height; y++) {
         for (uint16_t x = 0; x < meta.width; x++) {
-            hicolor_result res = hicolor_quantize_rgb(
-                meta,
-                image[HICOLOR_2D(x, y)],
-                &quant_rgb,
-                &quant_error_r,
-                &quant_error_g,
-                &quant_error_b
+            rgb = image[y * meta.width + x];
+
+            hicolor_rgb quant_rgb = rgb;
+            if (dither) {
+                hicolor_bayerize_rgb(meta.version, x, y, rgb, &quant_rgb);
+            }
+
+            hicolor_result res = hicolor_rgb_to_value(
+                meta.version,
+                quant_rgb,
+                &value
             );
             if (res != HICOLOR_OK) {
                 return res;
             }
 
-            image[HICOLOR_2D(x, y)] = quant_rgb;
-
-            if (x < meta.width - 1) {
-                image[HICOLOR_2D(x + 1, y)].r += quant_error_r * 7 / 16;
-                image[HICOLOR_2D(x + 1, y)].g += quant_error_g * 7 / 16;
-                image[HICOLOR_2D(x + 1, y)].b += quant_error_r * 7 / 16;
-            }
-            if (x > 0 && y < meta.height - 1) {
-                image[HICOLOR_2D(x - 1, y + 1)].r += quant_error_r * 3 / 16;
-                image[HICOLOR_2D(x - 1, y + 1)].g += quant_error_g * 3 / 16;
-                image[HICOLOR_2D(x - 1, y + 1)].b += quant_error_b * 3 / 16;
-            }
-            if (y < meta.height - 1) {
-                image[HICOLOR_2D(x, y + 1)].r += quant_error_r * 5 / 16;
-                image[HICOLOR_2D(x, y + 1)].g += quant_error_g * 5 / 16;
-                image[HICOLOR_2D(x, y + 1)].b += quant_error_b * 5 / 16;
-            }
-            if (x < meta.width - 1 && y < meta.height - 1) {
-                image[HICOLOR_2D(x + 1, y + 1)].r += quant_error_r * 1 / 16;
-                image[HICOLOR_2D(x + 1, y + 1)].g += quant_error_g * 1 / 16;
-                image[HICOLOR_2D(x + 1, y + 1)].b += quant_error_b * 1 / 16;
+            res = hicolor_value_to_rgb(
+                meta.version,
+                value,
+                &image[y * meta.width + x]
+            );
+            if (res != HICOLOR_OK) {
+                return res;
             }
         }
     }
 
     return HICOLOR_OK;
 };
-#undef HICOLOR_2D
 
 hicolor_result hicolor_read_rgb_image(
     FILE* stream,
@@ -348,7 +351,7 @@ hicolor_result hicolor_read_rgb_image(
     for (int i = 0; i < meta.width * meta.height; i++) {
         hicolor_value value;
         total += fread(&value, 1, sizeof(value), stream);
-        
+
         hicolor_result res =
             hicolor_value_to_rgb(meta.version, value, &image[i]);
         if (res != HICOLOR_OK) return res;
