@@ -10,6 +10,13 @@ if {[info exists env(HICOLOR_COMMAND)]} {
     set hicolorCommand $env(HICOLOR_COMMAND)
 }
 
+try {
+    exec gm version
+} on ok _ {
+    tcltest::testConstraint gm true
+} on error _ {}
+
+
 proc hicolor args {
     exec {*}$::hicolorCommand {*}$args
 }
@@ -113,13 +120,10 @@ tcltest::test quantize-1.2 {} -body {
 } -result {}
 
 
-tcltest::test data-integrity-1.1 {roundtrip} -body {
+tcltest::test data-integrity-1.1 {roundtrip} -constraints gm -body {
     hicolor decode photo.hi5 temp.png
-    hicolor encode -5 temp.png temp.hi5
-    set f1 [read-file photo.hi5]
-    set f2 [read-file temp.hi5]
-    expr { $f1 eq $f2 }
-} -result 1
+    exec gm compare -metric rmse photo.png temp.png
+} -match glob -result {*Total: 0.01*}
 
 
 incr failed [expr {$tcltest::numTests(Failed) > 0}]
