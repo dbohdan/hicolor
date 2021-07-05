@@ -6,8 +6,6 @@
 #define HICOLOR_IMPLEMENTATION
 #include "hicolor.h"
 
-bool verbose = false;
-
 bool check_and_report_error(char* step, hicolor_result res)
 {
     if (res == HICOLOR_OK) return false;
@@ -22,8 +20,42 @@ bool check_and_report_error(char* step, hicolor_result res)
     return true;
 }
 
+hicolor_rgb* cp_to_rgb(const cp_image_t img)
+{
+    hicolor_rgb* rgb_img = malloc(sizeof(hicolor_rgb) * img.w * img.h);
+
+    for (uint32_t i = 0; i < (uint32_t) img.w * (uint32_t) img.h; i++) {
+        rgb_img[i].r = img.pix[i].r;
+        rgb_img[i].g = img.pix[i].g;
+        rgb_img[i].b = img.pix[i].b;
+    }
+
+    return rgb_img;
+}
+
+cp_image_t rgb_to_cp(const hicolor_metadata meta, const hicolor_rgb* rgb_img)
+{
+    cp_pixel_t* pix =
+        malloc(sizeof(cp_pixel_t) * meta.width * meta.height);
+    cp_image_t img = {
+        .w = meta.width,
+        .h = meta.height,
+        .pix = pix
+    };
+
+    for (uint32_t i = 0; i < (uint32_t) img.w * (uint32_t) img.h; i++) {
+        img.pix[i].r = rgb_img[i].r;
+        img.pix[i].g = rgb_img[i].g;
+        img.pix[i].b = rgb_img[i].b;
+        img.pix[i].a = 255;
+    }
+
+    return img;
+}
+
 bool png_to_hicolor(
     hicolor_version version,
+    bool dither,
     const char* src,
     const char* dest
 )
@@ -34,19 +66,15 @@ bool png_to_hicolor(
         fprintf(stderr, "source image \"%s\" doesn't exist\n", src);
         return false;
     }
-    
-    cp_image_t png_img = cp_load_png(src);
 
-    if (verbose) {
-        fprintf(stderr, "PNG image size: %i x %i\n", png_img.w, png_img.h);
-    }
+    cp_image_t png_img = cp_load_png(src);
 
     FILE* hi_file = fopen(dest, "wb");
     if (hi_file == NULL) {
         fprintf(stderr, "can't open destination \"%s\" for writing\n", dest);
         return false;
     }
-    
+
     hicolor_metadata meta = {
         .version = version,
         .width = png_img.w,
@@ -55,36 +83,81 @@ bool png_to_hicolor(
     res = hicolor_write_header(hi_file, meta);
     bool success = false;
     if (check_and_report_error("can't write header", res)) {
-        goto cleanup_file;
+        goto clean_up_file;
     }
 
-    hicolor_rgb* rgb_img = malloc(sizeof(hicolor_rgb) * png_img.w * png_img.h);
-    for (uint32_t i = 0; i < (uint32_t) png_img.w * (uint32_t) png_img.h; i++) {
-        rgb_img[i].r = png_img.pix[i].r;
-        rgb_img[i].g = png_img.pix[i].g;
-        rgb_img[i].b = png_img.pix[i].b;
-    }
+    hicolor_rgb* rgb_img = cp_to_rgb(png_img);
 
-    res = hicolor_quantize_rgb_image(meta, rgb_img);
+    res = hicolor_quantize_rgb_image(meta, dither, rgb_img);
     if (check_and_report_error("can't quantize image", res)) {
-        goto cleanup_images;
+        goto clean_up_images;
     }
 
     res = hicolor_write_rgb_image(hi_file, meta, rgb_img);
     if (check_and_report_error("can't write image data", res)) {
-        goto cleanup_images;
+        goto clean_up_images;
     }
 
     success = true;
 
-cleanup_images:
+clean_up_images:
     free(png_img.pix);
     CUTE_PNG_MEMSET(&png_img, 0, sizeof(png_img));
 
     free(rgb_img);
 
-cleanup_file:
+clean_up_file:
     fclose(hi_file);
+
+    return success;
+}
+
+bool png_quantize(
+    hicolor_version version,
+    bool dither,
+    const char* src,
+    const char* dest
+)
+{
+    hicolor_result res;
+
+    if (access(src, F_OK) != 0) {
+        fprintf(stderr, "source image \"%s\" doesn't exist\n", src);
+        return false;
+    }
+
+    cp_image_t png_img = cp_load_png(src);
+
+    hicolor_metadata meta = {
+        .version = version,
+        .width = png_img.w,
+        .height = png_img.h
+    };
+
+    hicolor_rgb* rgb_img = cp_to_rgb(png_img);
+
+    res = hicolor_quantize_rgb_image(meta, dither, rgb_img);
+    bool success = false;
+    if (check_and_report_error("can't quantize image", res)) {
+        goto clean_up_images;
+    }
+
+    cp_image_t quant_png_img = rgb_to_cp(meta, rgb_img);
+    if (!cp_save_png(dest, &quant_png_img)) {
+        fprintf(stderr, "can't save PNG\n");
+        goto clean_up_quant_image;
+    }
+
+    success = true;
+
+clean_up_quant_image:
+    free(quant_png_img.pix);
+
+clean_up_images:
+    free(png_img.pix);
+    CUTE_PNG_MEMSET(&png_img, 0, sizeof(png_img));
+
+    free(rgb_img);
 
     return success;
 }
@@ -106,54 +179,37 @@ bool hicolor_to_png(
     res = hicolor_read_header(hi_file, &meta);
     bool success = false;
     if (check_and_report_error("can't read header", res)) {
-        goto cleanup_file;
-    }
-
-    if (verbose) {
-        fprintf(
-            stderr,
-            "HiColor image size: %i x %i\n",
-            meta.width,
-            meta.height
-        );
+        goto clean_up_file;
     }
 
     hicolor_rgb* rgb_img =
         malloc(sizeof(hicolor_rgb) * meta.width * meta.height);
     res = hicolor_read_rgb_image(hi_file, meta, rgb_img);
     if (check_and_report_error("can't read image data", res)) {
-        goto cleanup_rgb_img;
+        goto clean_up_rgb_img;
     }
 
-    cp_pixel_t* pix =
-        malloc(sizeof(cp_pixel_t) * meta.width * meta.height);
-    cp_image_t png_img = {
-        .w = meta.width,
-        .h = meta.height,
-        .pix = pix
-    };
-    
-    for (uint32_t i = 0; i < (uint32_t) png_img.w * (uint32_t) png_img.h; i++) {
-        png_img.pix[i].r = rgb_img[i].r;
-        png_img.pix[i].g = rgb_img[i].g;
-        png_img.pix[i].b = rgb_img[i].b;
-        png_img.pix[i].a = 255;
+    cp_image_t png_img = rgb_to_cp(meta, rgb_img);
+    if (!cp_save_png(dest, &png_img)) {
+        fprintf(stderr, "can't save PNG\n");
+        goto clean_up_png_image;
     }
-    cp_save_png(dest, &png_img);
-    free(pix);
 
     success = true;
 
-cleanup_rgb_img:
+clean_up_png_image:
+    free(png_img.pix);
+
+clean_up_rgb_img:
     free(rgb_img);
 
-cleanup_file:
+clean_up_file:
     fclose(hi_file);
 
     return success;
 }
 
-bool print_info(
+bool hicolor_print_info(
     const char* src
 )
 {
@@ -169,13 +225,13 @@ bool print_info(
     res = hicolor_read_header(hi_file, &meta);
     bool success = false;
     if (check_and_report_error("can't read header", res)) {
-        goto cleanup_file;
+        goto clean_up_file;
     }
 
     uint8_t vch;
     res = hicolor_version_to_char(meta.version, &vch);
     if (check_and_report_error("can't decode version", res)) {
-        goto cleanup_file;
+        goto clean_up_file;
     }
 
     printf(
@@ -187,7 +243,7 @@ bool print_info(
 
     success = true;
 
-cleanup_file:
+clean_up_file:
     fclose(hi_file);
 
     return success;
@@ -197,11 +253,17 @@ void usage()
 {
     fprintf(
         stderr,
-        "usage: hicolor (encode|decode) [(-5|-6|--15-bit|--16-bit)] "
-        "src [dest]\n"
-        "       hicolor info file\n"
-        "       hicolor version\n"
-        "       hicolor help\n"
+        "HiColor\n"
+        "Create 15/16-bit color images.\n\n"
+        "usage:\n"
+        "  hicolor (encode|decode|quantize) [options] src [dest]\n"
+        "  hicolor info file\n"
+        "  hicolor version\n"
+        "  hicolor help\n\n"
+        "options:\n"
+        "  -5, --15-bit     15-bit color\n"
+        "  -6, --16-bit     16-bit color\n"
+        "  -n, --no-dither  Do not dither the image\n"
     );
 }
 
@@ -216,12 +278,13 @@ void version() {
 }
 
 typedef enum command {
-    ENCODE, DECODE
+    ENCODE, DECODE, QUANTIZE
 } command;
 
 int main(int argc, char** argv)
 {
     command opt_command = ENCODE;
+    bool opt_dither = true;
     hicolor_version opt_version = HICOLOR_VERSION_6;
     char* opt_src;
     char* opt_dest;
@@ -237,14 +300,11 @@ int main(int argc, char** argv)
     }
 
     if (argc == 3 && strcmp(argv[1], "info") == 0) {
-        return !print_info(argv[2]);
+        return !hicolor_print_info(argv[2]);
     }
 
-    if (argc < 3 || argc > 5) {
-        fprintf(
-            stderr,
-            argc < 3 ? "too few arguments\n" : "too many arguments\n"
-        );
+    if (argc < 3) {
+        fprintf(stderr, "too few arguments\n");
         usage();
         return 1;
     }
@@ -255,6 +315,8 @@ int main(int argc, char** argv)
         opt_command = ENCODE;
     } else if (strcmp(argv[i], "decode") == 0) {
         opt_command = DECODE;
+    } else if (strcmp(argv[i], "quantize") == 0) {
+        opt_command = QUANTIZE;
     } else {
         fprintf(stderr, "invalid command\n");
         usage();
@@ -262,11 +324,21 @@ int main(int argc, char** argv)
     }
     i++;
 
-    if (strcmp(argv[i], "-5") == 0 || strcmp(argv[i], "--15-bit") == 0) {
-        opt_version = HICOLOR_VERSION_5;
-        i++;
-    } else if (strcmp(argv[i], "-6") == 0 || strcmp(argv[i], "--16-bit") == 0) {
-        opt_version = HICOLOR_VERSION_6;
+    while (i < argc && argv[i][0] == '-') {
+        if (strcmp(argv[i], "--") == 0) {
+            i++;
+            break;
+        } else if (strcmp(argv[i], "-5") == 0
+            || strcmp(argv[i], "--15-bit") == 0) {
+            opt_version = HICOLOR_VERSION_5;
+        } else if (strcmp(argv[i], "-6") == 0
+            || strcmp(argv[i], "--16-bit") == 0) {
+            opt_version = HICOLOR_VERSION_6;
+        } else if (strcmp(argv[i], "-n") == 0
+            || strcmp(argv[i], "--no-dither") == 0) {
+            opt_dither = false;
+        }
+
         i++;
     }
 
@@ -291,9 +363,18 @@ int main(int argc, char** argv)
     }
     i++;
 
-    if (opt_command == ENCODE) {
-        return !png_to_hicolor(opt_version, opt_src, opt_dest);
-    } else {
+    if (i < argc) {
+        fprintf(stderr, "too many arguments\n");
+        usage();
+        return 1;
+    }
+
+    switch (opt_command) {
+    case ENCODE:
+        return !png_to_hicolor(opt_version, opt_dither, opt_src, opt_dest);
+    case DECODE:
         return !hicolor_to_png(opt_src, opt_dest);
+    case QUANTIZE:
+        return !png_quantize(opt_version, opt_dither, opt_src, opt_dest);
     }
 }
