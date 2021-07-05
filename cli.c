@@ -68,6 +68,14 @@ bool png_to_hicolor(
     }
 
     cp_image_t png_img = cp_load_png(src);
+    if (png_img.pix == 0) {
+        fprintf(
+            stderr,
+            "can't load PNG file \"%s\": %s\n",
+            src,
+            cp_error_reason
+        );
+    }
 
     FILE* hi_file = fopen(dest, "wb");
     if (hi_file == NULL) {
@@ -127,6 +135,14 @@ bool png_quantize(
     }
 
     cp_image_t png_img = cp_load_png(src);
+    if (png_img.pix == 0) {
+        fprintf(
+            stderr,
+            "can't load PNG file \"%s\": %s\n",
+            src,
+            cp_error_reason
+        );
+    }
 
     hicolor_metadata meta = {
         .version = version,

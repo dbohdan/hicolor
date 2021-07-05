@@ -61,6 +61,10 @@ tcltest::test encode-1.5 {} -body {
     hicolor encode photo.png photo.png.hic ascii.txt foo bar baz 2>@1
 } -returnCodes error -match glob -result {*too many arg*}
 
+tcltest::test encode-1.6 {} -body {
+    hicolor encode [file tail [info script]]
+} -returnCodes error -match glob -result {*incorrect file signature*}
+
 
 tcltest::test encode-2.1 {encode flags} -body {
     hicolor encode -5 photo.png photo.png.hic
@@ -110,6 +114,10 @@ tcltest::test decode-1.2 {16-bit} -body {
     file exists photo.hi6.png
 } -result 1
 
+tcltest::test decode-1.3 {Bad input} -body {
+    hicolor decode [file tail [info script]]
+} -returnCodes error -match glob -result {*bad magic*}
+
 
 tcltest::test quantize-1.1 {} -body {
     hicolor quantize photo.png photo.16-bit.png
@@ -118,6 +126,10 @@ tcltest::test quantize-1.1 {} -body {
 tcltest::test quantize-1.2 {} -body {
     hicolor quantize -5 photo.png photo.15-bit.png
 } -result {}
+
+tcltest::test quantize-1.3 {} -body {
+    hicolor encode [file tail [info script]]
+} -returnCodes error -match glob -result {*incorrect file signature*}
 
 
 tcltest::test data-integrity-1.1 {roundtrip} -constraints gm -body {
