@@ -17,7 +17,14 @@ install-bin: hicolor
 install-include: picol.h
 	install -m 0644 $< $(DESTDIR)$(PREFIX)/include
 
+release: clean test test-win32
+	strip hicolor hicolor.exe
+	cp hicolor hicolor-v"$$(./hicolor version)"-linux-x86_64
+	cp hicolor.exe hicolor-v"$$(./hicolor version)"-win32.exe
+
 test: all
 	./tests/hicolor.test
+test-win32: hicolor.exe
+	HICOLOR_COMMAND='wine ../hicolor.exe' WINEDEBUG=-all ./tests/hicolor.test
 
-.PHONY: all clean install-bin install-include tests
+.PHONY: all clean install-bin install-include test test-win32
