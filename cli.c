@@ -244,7 +244,7 @@ bool hicolor_print_info(
         goto clean_up_file;
     }
 
-    uint8_t vch;
+    uint8_t vch = '\0';
     res = hicolor_version_to_char(meta.version, &vch);
     if (check_and_report_error("can't decode version", res)) {
         goto clean_up_file;
