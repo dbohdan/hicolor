@@ -53,7 +53,7 @@ options:
 ### Debian/Ubuntu
 
 ```sh
-sudo apt install -y build-essential tclsh
+sudo apt install -y build-essential graphicsmagick tclsh
 make test
 ```
 
@@ -64,8 +64,8 @@ The following commands build a 32-bit executable for Windows.
 ```sh
 sudo apt install -y build-essential gcc-mingw-w64-i686
 make hicolor.exe
-# Wine is needed only for testing.
-sudo apt install -y tclsh wine
+# Wine, Tcl, and GraphicsMagick are needed only for testing.
+sudo apt install -y graphicsmagick tclsh wine
 make test 'HICOLOR_COMMAND=wine ../hicolor.exe'
 ```
 
