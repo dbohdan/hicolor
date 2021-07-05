@@ -253,14 +253,24 @@ void usage()
 {
     fprintf(
         stderr,
-        "HiColor\n"
-        "Create 15/16-bit color images.\n\n"
         "usage:\n"
         "  hicolor (encode|decode|quantize) [options] src [dest]\n"
         "  hicolor info file\n"
         "  hicolor version\n"
-        "  hicolor help\n\n"
-        "options:\n"
+        "  hicolor help\n"
+    );   
+}
+
+void help()
+{
+    fprintf(
+        stderr,
+        "HiColor\n"
+        "Create 15/16-bit color images.\n\n"
+    );
+    usage();
+    fprintf(stderr,
+        "\noptions:\n"
         "  -5, --15-bit     15-bit color\n"
         "  -6, --16-bit     16-bit color\n"
         "  -n, --no-dither  Do not dither the image\n"
@@ -295,7 +305,7 @@ int main(int argc, char** argv)
     }
 
     if (argc == 2 && strcmp(argv[1], "help") == 0) {
-        usage();
+        help();
         return 0;
     }
 
