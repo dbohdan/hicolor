@@ -159,6 +159,10 @@ bool png_quantize(
     }
 
     cp_image_t quant_png_img = rgb_to_cp(meta, rgb_img);
+    /* Restore the alpha channel. */
+    for (uint32_t i = 0; i < (uint32_t) png_img.w * (uint32_t) png_img.h; i++) {
+        quant_png_img.pix[i].a = png_img.pix[i].a;
+    }
     if (!cp_save_png(dest, &quant_png_img)) {
         fprintf(stderr, "can't save PNG\n");
         goto clean_up_quant_image;

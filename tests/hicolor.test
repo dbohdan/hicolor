@@ -137,6 +137,11 @@ tcltest::test data-integrity-1.1 {roundtrip} -constraints gm -body {
     exec gm compare -metric rmse photo.png temp.png
 } -match glob -result {*Total: 0.01*}
 
+tcltest::test data-integrity-2.1 {alpha roundtrip} -constraints gm -body {
+    hicolor quantize alpha.png alpha-q.png
+    exec gm compare -metric rmse alpha.png alpha-q.png
+} -match regexp -result {Total: 0.0+ }
+
 
 incr failed [expr {$tcltest::numTests(Failed) > 0}]
 tcltest::cleanupTests
