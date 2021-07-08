@@ -8,7 +8,7 @@ I wrote this program because I wanted to create images with the characteristic h
 
 Quantized images compress better when their originals, so HiColor may serve as a less-lossy alternative to the 256-color [pngquant](https://pngquant.org/).  However, unlike pngquant, it does not preserve transparency.
 
-The program is written in C with minimal dependencies and builds as a static binary by default.  It works at least on Linux and Windows 7.
+The program is written in C with minimal dependencies and builds as a static binary by default.  It works at least on Linux and Windows 98 Second Edition, 2000 Service Pack 4, XP, and 7.
 
 ## Known bugs and limitations
 
