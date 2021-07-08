@@ -172,6 +172,7 @@ hicolor_result hicolor_value_to_rgb(
 {
     switch (version) {
     case HICOLOR_VERSION_5:
+        if (value & 0x8000) return HICOLOR_INVALID_VALUE;
         rgb->r = (value & 0x1f) << 3;
         rgb->g = (value & 0x3ff) >> (5 - 3);
         rgb->b = (value & 0x7fff) >> (10 - 3);
