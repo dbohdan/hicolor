@@ -14,7 +14,7 @@ clean:
 install: install-bin install-include
 install-bin: hicolor
 	install $< $(DESTDIR)$(PREFIX)/bin/hicolor
-install-include: picol.h
+install-include: hicolor.h
 	install -m 0644 $< $(DESTDIR)$(PREFIX)/include
 
 release: clean test test-wine
