@@ -286,7 +286,7 @@ void help()
     fprintf(
         stderr,
         "HiColor\n"
-        "Create 15/16-bit color images.\n\n"
+        "Create 15/16-bit color RGB images.\n\n"
     );
     usage();
     fprintf(stderr,

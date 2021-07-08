@@ -36,7 +36,7 @@ The actions `encode` and `decode` convert images between PNG and HiColor's own i
 
 ```none
 HiColor
-Create 15/16-bit color images.
+Create 15/16-bit color RGB images.
 
 usage:
   hicolor (encode|decode|quantize) [options] src [dest]
