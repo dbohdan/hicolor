@@ -30,10 +30,29 @@ proc read-file path {
     }
 }
 
+proc prefixes s {
+    for {set i 0} {$i < [string length $s]} {incr i} {
+        lappend prefixes [string range $s 0 $i]
+    }
+
+    return $prefixes
+}
+
 
 tcltest::test version-1.1 {} -body {
     hicolor version
 } -match regexp -result {\d+\.\d+\.\d+}
+
+tcltest::test version-2.1 {} -body {
+    set action version
+    set output [hicolor $action]
+
+    lmap prefix [prefixes $action] {
+        expr {
+            [hicolor $prefix] eq $output
+        }
+    }
+} -match regexp -result {1(?: 1)+}
 
 
 tcltest::test help-1.1 {} -body {
@@ -138,7 +157,7 @@ tcltest::test data-integrity-1.1 {roundtrip} -constraints gm -body {
 } -match glob -result {*Total: 0.01*}
 
 tcltest::test data-integrity-2.1 {alpha roundtrip} -constraints gm -body {
-    hicolor quantize alpha.png alpha-q.png
+    hicolor quant alpha.png alpha-q.png
     exec gm compare -metric rmse alpha.png alpha-q.png
 } -match regexp -result {Total: 0.0+ }
 

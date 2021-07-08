@@ -307,6 +307,19 @@ void version() {
     );
 }
 
+bool str_prefix(const char* ref, const char* str)
+{
+    size_t i;
+
+    for (i = 0; str[i] != '\0'; i++) {
+        if (str[i] != ref[i]) return false;
+    }
+
+    if (i == 0) return false;
+
+    return true;
+}
+
 typedef enum command {
     ENCODE, DECODE, QUANTIZE
 } command;
@@ -319,17 +332,17 @@ int main(int argc, char** argv)
     char* opt_src;
     char* opt_dest;
 
-    if (argc == 2 && strcmp(argv[1], "version") == 0) {
+    if (argc == 2 && str_prefix("version", argv[1])) {
         version();
         return 0;
     }
 
-    if (argc == 2 && strcmp(argv[1], "help") == 0) {
+    if (argc == 2 && str_prefix("help", argv[1])) {
         help();
         return 0;
     }
 
-    if (argc == 3 && strcmp(argv[1], "info") == 0) {
+    if (argc == 3 && str_prefix("info", argv[1])) {
         return !hicolor_print_info(argv[2]);
     }
 
@@ -341,11 +354,11 @@ int main(int argc, char** argv)
 
     int i = 1;
 
-    if (strcmp(argv[i], "encode") == 0) {
+    if (str_prefix("encode", argv[i])) {
         opt_command = ENCODE;
-    } else if (strcmp(argv[i], "decode") == 0) {
+    } else if (str_prefix("decode", argv[i])) {
         opt_command = DECODE;
-    } else if (strcmp(argv[i], "quantize") == 0) {
+    } else if (str_prefix("quantize", argv[i])) {
         opt_command = QUANTIZE;
     } else {
         fprintf(stderr, "invalid command\n");
