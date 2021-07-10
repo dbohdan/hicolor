@@ -1,3 +1,15 @@
+/* HiColor image file format encoder/decoder library.
+ *
+ * Copyright (c) 2021 D. Bohdan and contributors listed in AUTHORS.
+ * License: MIT.
+ *
+ * This header file contains both the interface and the implementation for
+ * HiColor.  To instantiate the implementation put the line
+ *     #define HICOLOR_IMPLEMENTATION
+ * in a single source code file of your project above where you include this
+ * file.
+ */
+
 #ifndef HICOLOR_H
 #define HICOLOR_H
 
