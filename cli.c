@@ -1,3 +1,9 @@
+/* HiColor CLI.
+ *
+ * Copyright (c) 2021 D. Bohdan and contributors listed in AUTHORS.
+ * License: MIT.
+ */
+
 #include <unistd.h>
 
 #define CUTE_PNG_IMPLEMENTATION
