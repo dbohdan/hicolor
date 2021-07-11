@@ -20,7 +20,7 @@ PNG files HiColor produces are unoptimized.  Run them through [OptiPNG](http://o
 
 Right now repeated conversion to `.hic` and repeated quantization cause (capped) [generation loss](https://en.wikipedia.org/wiki/Generation_loss) when dithering is enabled (by default).  There is no such generation loss without the dithering.  I am not sure whether to fix this or to keep it for artistic use.  I think the effect looks cool on colorful high-contrast anime-style images, making them resemble [PC-98](https://en.wikipedia.org/wiki/PC-9800_series) art.  The example below illustrates a best-case scenario.  It converged (stopped changing) after 50 generations.  Most anime images won't look this good.
 
-![An example of color generation loss with HiColor](https://i.imgur.com/FpLRyE4.png)
+![An example of color generation loss with HiColor](https://i.imgur.com/igKOF0l.png)
 
 (Cropped from a [piece](https://www.pixiv.net/en/artworks/50218294) by Suparu.  I believe this is fair use, but I'll remove this picture if you own it and ask.)
 
