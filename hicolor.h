@@ -278,6 +278,18 @@ hicolor_result hicolor_write_header(
     return HICOLOR_IO_ERROR;
 }
 
+uint8_t hicolor_bayerize_channel(
+    uint8_t value,
+    double factor,
+    double threshold
+)
+{
+    double bv = (double) value + factor * threshold;
+    if (bv < 0) bv = 0;
+    if (bv > 255) bv = 255;
+
+    return (uint8_t) bv;
+}
 
 void hicolor_bayerize_rgb(
     hicolor_version version,
@@ -295,21 +307,9 @@ void hicolor_bayerize_rgb(
     double threshold = 8.0;
     double threshold_g = version == HICOLOR_VERSION_5 ? threshold : 4.0;
 
-    double r = (double) rgb.r + factor * threshold;
-    if (r < 0) r = 0;
-    if (r > 255) r = 255;
-
-    double g = (double) rgb.g + factor * threshold_g;
-    if (g < 0) g = 0;
-    if (g > 255) g = 255;
-
-    double b = (double) rgb.b + factor * threshold;
-    if (b < 0) b = 0;
-    if (b > 255) b = 255;
-
-    output->r = (uint8_t) r;
-    output->g = (uint8_t) g;
-    output->b = (uint8_t) b;
+    output->r = hicolor_bayerize_channel(rgb.r, factor, threshold);
+    output->g = hicolor_bayerize_channel(rgb.g, factor, threshold_g);
+    output->b = hicolor_bayerize_channel(rgb.b, factor, threshold);
 }
 
 hicolor_result hicolor_quantize_rgb_image(
