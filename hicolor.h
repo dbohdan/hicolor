@@ -279,16 +279,16 @@ hicolor_result hicolor_write_header(
 }
 
 uint8_t hicolor_bayerize_channel(
-    uint8_t value,
+    uint8_t intensity,
     double factor,
     double threshold
 )
 {
-    double bv = (double) value + factor * threshold;
-    if (bv < 0) bv = 0;
-    if (bv > 255) bv = 255;
+    double dithered = (double) intensity + factor * threshold;
+    if (dithered < 0) dithered = 0;
+    if (dithered > 255) dithered = 255;
 
-    return (uint8_t) bv;
+    return (uint8_t) dithered;
 }
 
 void hicolor_bayerize_rgb(
