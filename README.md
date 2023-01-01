@@ -18,15 +18,23 @@ PNG files HiColor produces are unoptimized.  Run them through [OptiPNG](http://o
 
 ### Generation loss
 
-Right now repeated conversion to `.hic` and repeated quantization cause (capped) [generation loss](https://en.wikipedia.org/wiki/Generation_loss) when dithering is enabled (by default).  There is no such generation loss without the dithering.  I am not sure whether to fix this or to keep it for artistic use.  I think the effect looks cool on colorful high-contrast anime-style images, making them resemble [PC-98](https://en.wikipedia.org/wiki/PC-9800_series) art.  The example below illustrates a best-case scenario.  It converged (stopped changing) after 50 generations.  Most anime images won't look this good.
+Right now repeated conversion to `.hic` and repeated quantization cause (capped) [generation loss](https://en.wikipedia.org/wiki/Generation_loss) when dithering is enabled (by default).  There is no generation loss without the dithering.  In the best-case scenario the effect makes colorful high-contrast anime-style images resemble [PC-98](https://en.wikipedia.org/wiki/PC-9800_series) art.
 
-![An example of color generation loss with HiColor](https://i.imgur.com/igKOF0l.png)
+The example below illustrates the generation loss.  It converged (stopped changing) after 50 generations.  Most anime images won't look this good.
+
+Single quantization:
+
+![A crop of an anime character digital drawing processed with HiColor](https://i.imgur.com/dTmzRwF.png)
+
+50 quantizations:
+
+![A crop of the same drawing processed 50 times to illustrate generation loss](https://i.imgur.com/igKOF0l.png)
 
 (Cropped from a [piece](https://www.pixiv.net/en/artworks/50218294) by Suparu.  I believe this is fair use, but I'll remove this picture if you own it and ask.)
 
 ![A photo of New York City after 100 generations of `quantize`.](nyc-15bit-gen-100.png).
 
-Photos suffer more than artwork.  They work best when they are high-contrast with a lot of neon.
+Photos suffer worse than artwork.  They work best when they are high-contrast with a lot of neon.
 
 ## Usage
 
