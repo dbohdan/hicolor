@@ -1,6 +1,6 @@
 /* HiColor image file format encoder/decoder library.
  *
- * Copyright (c) 2021 D. Bohdan and contributors listed in AUTHORS.
+ * Copyright (c) 2021, 2023 D. Bohdan and contributors listed in AUTHORS.
  * License: MIT.
  *
  * This header file contains both the interface and the implementation for
@@ -18,7 +18,7 @@
 #include <stdio.h>
 
 #define HICOLOR_BAYER_SIZE 8
-#define HICOLOR_LIBRARY_VERSION 201
+#define HICOLOR_LIBRARY_VERSION 202
 
 /* Types. */
 
