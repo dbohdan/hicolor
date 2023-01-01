@@ -12,6 +12,8 @@
 #define HICOLOR_IMPLEMENTATION
 #include "hicolor.h"
 
+#define HICOLOR_CLI_NO_MEMORY_EXIT_CODE 255
+
 bool check_and_report_error(char* step, hicolor_result res)
 {
     if (res == HICOLOR_OK) return false;
@@ -29,6 +31,7 @@ bool check_and_report_error(char* step, hicolor_result res)
 hicolor_rgb* cp_to_rgb(const cp_image_t img)
 {
     hicolor_rgb* rgb_img = malloc(sizeof(hicolor_rgb) * img.w * img.h);
+    if (rgb_img == NULL) return NULL;
 
     for (uint32_t i = 0; i < (uint32_t) img.w * (uint32_t) img.h; i++) {
         rgb_img[i].r = img.pix[i].r;
@@ -48,6 +51,10 @@ cp_image_t rgb_to_cp(const hicolor_metadata meta, const hicolor_rgb* rgb_img)
         .h = meta.height,
         .pix = pix
     };
+    if (pix == NULL) {
+        img.w = 0;
+        img.h = 0;
+    }
 
     for (uint32_t i = 0; i < (uint32_t) img.w * (uint32_t) img.h; i++) {
         img.pix[i].r = rgb_img[i].r;
@@ -102,6 +109,10 @@ bool png_to_hicolor(
     }
 
     hicolor_rgb* rgb_img = cp_to_rgb(png_img);
+    if (rgb_img == NULL) {
+        fprintf(stderr, "can't allocate memory for RGB image\n");
+        goto clean_up_file;
+    }
 
     res = hicolor_quantize_rgb_image(meta, dither, rgb_img);
     if (check_and_report_error("can't quantize image", res)) {
@@ -159,6 +170,10 @@ bool png_quantize(
     };
 
     hicolor_rgb* rgb_img = cp_to_rgb(png_img);
+    if (rgb_img == NULL) {
+        fprintf(stderr, "can't allocate memory for RGB image\n");
+        return false;
+    }
 
     res = hicolor_quantize_rgb_image(meta, dither, rgb_img);
     bool success = false;
@@ -212,6 +227,9 @@ bool hicolor_to_png(
 
     hicolor_rgb* rgb_img =
         malloc(sizeof(hicolor_rgb) * meta.width * meta.height);
+    if (rgb_img == NULL) {
+        goto clean_up_file;
+    }
     res = hicolor_read_rgb_image(hi_file, meta, rgb_img);
     if (check_and_report_error("can't read image data", res)) {
         goto clean_up_rgb_img;
@@ -286,7 +304,7 @@ void usage()
         "  hicolor info file\n"
         "  hicolor version\n"
         "  hicolor help\n"
-    );   
+    );
 }
 
 void help()
@@ -404,6 +422,7 @@ int main(int argc, char** argv)
 
     if (i == argc) {
         opt_dest = malloc(strlen(opt_src) + 5);
+        if (opt_dest == NULL) return HICOLOR_CLI_NO_MEMORY_EXIT_CODE;
         sprintf(
             opt_dest,
             opt_command == ENCODE ? "%s.hic" : "%s.png",
