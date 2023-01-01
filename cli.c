@@ -1,6 +1,6 @@
 /* HiColor CLI.
  *
- * Copyright (c) 2021 D. Bohdan and contributors listed in AUTHORS.
+ * Copyright (c) 2021, 2023 D. Bohdan and contributors listed in AUTHORS.
  * License: MIT.
  */
 
@@ -81,6 +81,7 @@ bool png_to_hicolor(
             src,
             cp_error_reason
         );
+        return false;
     }
 
     FILE* hi_file = fopen(dest, "wb");
@@ -148,6 +149,7 @@ bool png_quantize(
             src,
             cp_error_reason
         );
+        return false;
     }
 
     hicolor_metadata meta = {
