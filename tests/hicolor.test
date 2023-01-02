@@ -125,9 +125,10 @@ tcltest::test encode-3.1 {bad input} -body {
 } -returnCodes error -result {can't load PNG file "truncated.png": corrupt\
     zlib structure in DEFLATE stream}
 
-tcltest::test encode-3.2 {bad input} -constraints segfault -body {
+tcltest::test encode-3.2 {bad input} -body {
     hicolor encode wrong-size.png
-} -returnCodes error -result {}
+} -returnCodes error -result {can't load PNG file "wrong-size.png": image too\
+    large}
 
 
 hicolor encode --15-bit photo.png photo.hi5
@@ -166,9 +167,10 @@ tcltest::test quantize-2.2 {bad input} -body {
 } -returnCodes error -result {can't load PNG file "truncated.png": corrupt\
     zlib structure in DEFLATE stream}
 
-tcltest::test quantize-2.3 {bad input} -constraints segfault -body {
+tcltest::test quantize-2.3 {bad input} -body {
     hicolor quantize wrong-size.png
-} -returnCodes error -result {}
+} -returnCodes error -result {can't load PNG file "wrong-size.png": image too\
+    large}
 
 
 tcltest::test data-integrity-1.1 {roundtrip} -constraints gm -body {
