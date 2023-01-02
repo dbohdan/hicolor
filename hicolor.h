@@ -14,11 +14,12 @@
 #define HICOLOR_H
 
 #include <inttypes.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
 
 #define HICOLOR_BAYER_SIZE 8
-#define HICOLOR_LIBRARY_VERSION 202
+#define HICOLOR_LIBRARY_VERSION 300
 
 /* Types. */
 
@@ -281,14 +282,13 @@ hicolor_result hicolor_write_header(
 uint8_t hicolor_bayerize_channel(
     uint8_t intensity,
     double factor,
-    double threshold
+    double step
 )
 {
-    double dithered = (double) intensity + factor * threshold;
-    if (dithered < 0) dithered = 0;
-    if (dithered > 255) dithered = 255;
+    double dithered = ((double) intensity) / 255 + step / 256 * (factor - 63/64);
 
-    return (uint8_t) dithered;
+    double levels = 128.0 / step;
+    return (uint8_t) (round(dithered * levels) / levels * 255);
 }
 
 void hicolor_bayerize_rgb(
@@ -304,12 +304,12 @@ void hicolor_bayerize_rgb(
         x % HICOLOR_BAYER_SIZE;
     double factor = hicolor_bayer[bayer_coord];
 
-    double threshold = 8.0;
-    double threshold_g = version == HICOLOR_VERSION_5 ? threshold : 4.0;
+    double step = 8.0;
+    double step_g = version == HICOLOR_VERSION_5 ? step : 4.0;
 
-    output->r = hicolor_bayerize_channel(rgb.r, factor, threshold);
-    output->g = hicolor_bayerize_channel(rgb.g, factor, threshold_g);
-    output->b = hicolor_bayerize_channel(rgb.b, factor, threshold);
+    output->r = hicolor_bayerize_channel(rgb.r, factor, step);
+    output->g = hicolor_bayerize_channel(rgb.g, factor, step_g);
+    output->b = hicolor_bayerize_channel(rgb.b, factor, step);
 }
 
 hicolor_result hicolor_quantize_rgb_image(
