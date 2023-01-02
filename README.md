@@ -2,9 +2,11 @@
 
 ![A building with a dithered gradient of the sky behind it.  A jet airplane is taking off in the sky.](bordeaux-15bit.png)
 
+*(The image above has 15-bit color.)*
+
 HiColor is a program for converting images to 15- and 16-bit RGB color, the color depth of old display modes known as [&ldquo;high color&rdquo;](https://en.wikipedia.org/wiki/High_color).  In 15-bit mode images have 5 bits for each of red, green, and blue, and the last bit is reserved.  In 16-bit mode green, the color the human eye is generally most sensitive to, gets 6 bits.
 
-I wrote this program because I wanted to create images with the characteristic high-color look, and nothing seemed to support high color.  It implements its own simple [file format](format.md) and converts between this format and PNG.  It can also convert normal PNG to normal 32-bit PNG with only high color color values.  (This simulates a roundtrip through HiColor without creating a temporary file.)  To reduce the quantization error (the difference between the original and the high-color pixel), HiColor uses the [Bayer ordered dithering](https://bisqwit.iki.fi/story/howto/dither/jy/#StandardOrderedDitheringAlgorithm) algorithm, which historical software and hardware used for dithering in high color modes.  Dithering can be disabled with a command line flag.  HiColor files have the extension `.hic` or `.hi5` for 15-bit and `.hi6` for 16-bit.
+I wrote this program because I wanted to create images with the characteristic high-color look, and nothing seemed to support high color.  It implements its own simple [file format](format.md) and converts between this format and PNG.  It can also convert normal PNG to normal 32-bit PNG with only high color color values.  (This simulates a roundtrip through HiColor without creating a temporary file.)  To reduce the quantization error (the difference between the original and the high-color pixel), HiColor uses the [Bayer ordered dithering](https://bisqwit.iki.fi/story/howto/dither/jy/#StandardOrderedDitheringAlgorithm) algorithm, which historical software and hardware used for dithering in high color modes.  Dithering can be disabled with a command line flag.  HiColor files have either the extension `.hic` or `.hi5` for 15-bit and `.hi6` for 16-bit respectively.
 
 Quantized images compress better when their originals, so HiColor may serve as a less-lossy alternative to the 256-color [pngquant](https://pngquant.org/).  Quantizing a PNG file to PNG preserves transparency (but does not quantize the alpha channel).  Conversion to and from the HiColor format does not preserve transparency.
 
@@ -30,9 +32,9 @@ Single quantization:
 
 ![A crop of the same drawing processed 50 times to illustrate generation loss](https://i.imgur.com/igKOF0l.png)
 
-(Cropped from a [piece](https://www.pixiv.net/en/artworks/50218294) by Suparu.  I believe this is fair use, but I'll remove this picture if you own it and ask.)
+(Cropped from a [piece](https://www.pixiv.net/en/artworks/50218294) by Suparu.  I believe this is fair use, but I will remove the pictures upon request.)
 
-![A photo of New York City after 100 generations of `quantize`.](nyc-15bit-gen-100.png).
+![A photo of New York City after 100 generations of `quantize`](nyc-15bit-gen-100.png).
 
 Photos suffer worse than artwork.  They work best when they are high-contrast with a lot of neon.
 
@@ -83,7 +85,7 @@ make test-wine
 
 MIT.
 
-[cute\_png](https://github.com/RandyGaul/cute_headers/) is copyright (c) 2019 Randy Gaul and is licensed under the zlib license.
+[cute\_png](https://github.com/RandyGaul/cute_headers/) is copyright (c) 2019, 2021-2022 Randy Gaul and is licensed under the zlib license.
 
 ### Photos from Unsplash
 
