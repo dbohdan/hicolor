@@ -4,9 +4,9 @@ PREFIX ?= /usr/local
 
 all: hicolor
 
-hicolor: cli.c hicolor.h
+hicolor: cli.c hicolor.h vendor/cute_png.h
 	$(CC) $< -o $@ $(CFLAGS)
-hicolor.exe: cli.c hicolor.h
+hicolor.exe: cli.c hicolor.h vendor/cute_png.h
 	$(WIN32_CC) $< -o $@ $(CFLAGS)
 clean:
 	-rm -f hicolor hicolor.exe
