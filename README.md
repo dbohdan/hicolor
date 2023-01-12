@@ -69,7 +69,7 @@ make test-wine
 
 MIT.
 
-[cute\_png](https://github.com/RandyGaul/cute_headers/) is copyright (c) 2019, 2021-2022 Randy Gaul and is licensed under the zlib license.
+[cute\_png](https://github.com/RandyGaul/cute_headers/) is copyright (c) 2019, 2021-2023 Randy Gaul and is licensed under the zlib license.
 
 ### Photos from Unsplash
 
