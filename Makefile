@@ -1,5 +1,5 @@
 WIN32_CC ?= i686-w64-mingw32-gcc
-CFLAGS ?= -O3 -static -lm -Wall -Wextra
+CFLAGS ?= -g -O3 -static -lm -Wall -Wextra
 PREFIX ?= /usr/local
 
 all: hicolor
