@@ -1,12 +1,48 @@
 name: CI
 on: [push]
 jobs:
-  test:
+  test-ubuntu:
     runs-on: ubuntu-latest
     steps:
-    - name: Install dependencies
-      run: sudo apt update && sudo apt install -y graphicsmagick
     - name: Checkout
       uses: actions/checkout@v1
-    - name: Run tests
-      run: make test
+    - name: Run CI script
+      run: .github/workflows/ci.sh 
+  test-bsd:
+    runs-on: ${{ matrix.os.host }}
+    strategy:
+      matrix:
+        os:
+          - name: freebsd
+            architecture: x86-64
+            version: '13.1'
+            host: ubuntu-latest
+
+          - name: openbsd
+            architecture: x86-64
+            version: '7.2'
+            host: ubuntu-latest
+
+          - name: openbsd
+            architecture: arm64
+            version: '7.2'
+            host: ubuntu-latest
+
+          - name: netbsd
+            architecture: x86-64
+            version: '9.2'
+            host: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Run CI script on ${{ matrix.os.name }}
+        uses: cross-platform-actions/action@v0.9.0
+        with:
+          operating_system: ${{ matrix.os.name }}
+          architecture: ${{ matrix.os.architecture }}
+          version: ${{ matrix.os.version }}
+          shell: bash
+          run: |
+            .github/workflows/ci.sh
