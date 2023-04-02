@@ -10,7 +10,7 @@ I wrote this program because I wanted to create images with the characteristic h
 
 Quantized images compress better when their originals, so HiColor may serve as a less-lossy alternative to the 256-color [pngquant](https://pngquant.org/).  Quantizing a PNG file to PNG preserves transparency (but does not quantize the alpha channel).  Conversion to and from the HiColor format does not preserve transparency.
 
-The program is written in C with minimal dependencies and builds as a static binary by default.  It is known to work on Linux (i386, x86\_64, riscv64), FreeBSD, NetBSD, OpenBSD, and Windows 98 Second Edition, 2000 Service Pack 4, XP, and 7.
+The program is written in C with minimal dependencies and builds as a static binary by default.  It is known to work on Linux (aarch64, i386, riscv64, x86\_64), FreeBSD, NetBSD, OpenBSD, and Windows 98 Second Edition, 2000 Service Pack 4, XP, and 7.
 
 ## Known bugs and limitations
 
