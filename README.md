@@ -16,7 +16,7 @@ The program is written in C with minimal dependencies and builds as a static bin
 
 ### PNG file size
 
-PNG files produced by HiColor are not optimized.  Run them through [OptiPNG](http://optipng.sourceforge.net/) to significantly reduce their size.
+PNG files produced by HiColor are not optimized.  Run them through [OptiPNG](http://optipng.sourceforge.net/) or [Oxipng](https://github.com/shssoichiro/oxipng) to significantly reduce their size.
 
 ### Generation loss
 
