@@ -78,8 +78,10 @@
 			CUTE_PNG_CALLOC
 			CUTE_PNG_REALLOC
 			CUTE_PNG_MEMCPY
+			CUTE_PNG_MEMCMP
 			CUTE_PNG_MEMSET
 			CUTE_PNG_ASSERT
+			CUTE_PNG_FPRINTF
 			CUTE_PNG_SEEK_SET
 			CUTE_PNG_SEEK_END
 			CUTE_PNG_FILE
@@ -260,6 +262,11 @@ struct cp_atlas_image_t
 	#define CUTE_PNG_MEMCPY memcpy
 #endif
 
+#if !defined(CUTE_PNG_MEMCMP)
+	#include <string.h>
+	#define CUTE_PNG_MEMCMP memcmp
+#endif
+
 #if !defined(CUTE_PNG_MEMSET)
 	#include <string.h>
 	#define CUTE_PNG_MEMSET memset
@@ -268,6 +275,11 @@ struct cp_atlas_image_t
 #if !defined(CUTE_PNG_ASSERT)
 	#include <assert.h>
 	#define CUTE_PNG_ASSERT assert
+#endif
+
+#if !defined(CUTE_PNG_FPRINTF)
+	#include <stdio.h>
+	#define CUTE_PNG_FPRINTF fprintf
 #endif
 
 #if !defined(CUTE_PNG_SEEK_SET)
@@ -941,7 +953,7 @@ static const uint8_t* cp_chunk(cp_raw_png_t* png, const char* chunk, uint32_t mi
 	uint32_t len = cp_make32(png->p);
 	const uint8_t* start = png->p;
 
-	if (!memcmp(start + 4, chunk, 4) && len >= minlen)
+	if (!CUTE_PNG_MEMCMP(start + 4, chunk, 4) && len >= minlen)
 	{
 		int offset = len + 12;
 
@@ -964,7 +976,7 @@ static const uint8_t* cp_find(cp_raw_png_t* png, const char* chunk, uint32_t min
 		start = png->p;
 		png->p += len + 12;
 
-		if (!memcmp(start+4, chunk, 4) && len >= minlen && png->p <= png->end)
+		if (!CUTE_PNG_MEMCMP(start+4, chunk, 4) && len >= minlen && png->p <= png->end)
 			return start + 8;
 	}
 
@@ -1084,7 +1096,7 @@ cp_image_t cp_load_png_mem(const void* png_data, int png_length)
 	png.p = (uint8_t*)png_data;
 	png.end = (uint8_t*)png_data + png_length;
 
-	CUTE_PNG_CHECK(!memcmp(png.p, sig, 8), "incorrect file signature (is this a png file?)");
+	CUTE_PNG_CHECK(!CUTE_PNG_MEMCMP(png.p, sig, 8), "incorrect file signature (is this a png file?)");
 	png.p += 8;
 
 	ihdr = cp_chunk(&png, "IHDR", 13);
@@ -1245,7 +1257,7 @@ void cp_load_png_wh(const void* png_data, int png_length, int* w_out, int* h_out
 	if (w_out) *w_out = 0;
 	if (h_out) *h_out = 0;
 
-	CUTE_PNG_CHECK(!memcmp(png.p, sig, 8), "incorrect file signature (is this a png file?)");
+	CUTE_PNG_CHECK(!CUTE_PNG_MEMCMP(png.p, sig, 8), "incorrect file signature (is this a png file?)");
 	png.p += 8;
 
 	ihdr = cp_chunk(&png, "IHDR", 13);
@@ -1313,7 +1325,7 @@ cp_indexed_image_t cp_load_indexed_png_mem(const void *png_data, int png_length)
 	png.p = (uint8_t*)png_data;
 	png.end = (uint8_t*)png_data + png_length;
 
-	CUTE_PNG_CHECK(!memcmp(png.p, sig, 8), "incorrect file signature (is this a png file?)");
+	CUTE_PNG_CHECK(!CUTE_PNG_MEMCMP(png.p, sig, 8), "incorrect file signature (is this a png file?)");
 	png.p += 8;
 
 	ihdr = cp_chunk(&png, "IHDR", 13);
@@ -1637,7 +1649,7 @@ cp_image_t cp_make_atlas(int atlas_width, int atlas_height, const cp_image_t* pn
 			int new_capacity = atlas_node_capacity * 2;
 			cp_atlas_node_t* new_nodes = (cp_atlas_node_t*)CUTE_PNG_ALLOC(sizeof(cp_atlas_node_t) * new_capacity);
 			CUTE_PNG_CHECK(new_nodes, "out of mem");
-			memcpy(new_nodes, nodes, sizeof(cp_atlas_node_t) * sp);
+			CUTE_PNG_MEMCPY(new_nodes, nodes, sizeof(cp_atlas_node_t) * sp);
 			CUTE_PNG_FREE(nodes);
 			// best_fit became a dangling pointer, so relocate it
 			best_fit = new_nodes + (best_fit - nodes);
@@ -1765,7 +1777,7 @@ int cp_default_save_atlas(const char* out_path_image, const char* out_path_atlas
 	CUTE_PNG_FILE* fp = CUTE_PNG_FOPEN(out_path_atlas_txt, "wt");
 	CUTE_PNG_CHECK(fp, "unable to open out_path_atlas_txt in cp_default_save_atlas");
 
-	fprintf(fp, "%s\n%d\n\n", out_path_image, img_count);
+	CUTE_PNG_FPRINTF(fp, "%s\n%d\n\n", out_path_image, img_count);
 
 	for (int i = 0; i < img_count; ++i)
 	{
@@ -1781,8 +1793,8 @@ int cp_default_save_atlas(const char* out_path_image, const char* out_path_atlas
 			float max_x = image->maxx;
 			float max_y = image->maxy;
 
-			if (name) fprintf(fp, "{ \"%s\", w = %d, h = %d, u = { %.10f, %.10f }, v = { %.10f, %.10f } }\n", name, width, height, min_x, min_y, max_x, max_y);
-			else fprintf(fp, "{ w = %d, h = %d, u = { %.10f, %.10f }, v = { %.10f, %.10f } }\n", width, height, min_x, min_y, max_x, max_y);
+			if (name) CUTE_PNG_FPRINTF(fp, "{ \"%s\", w = %d, h = %d, u = { %.10f, %.10f }, v = { %.10f, %.10f } }\n", name, width, height, min_x, min_y, max_x, max_y);
+			else CUTE_PNG_FPRINTF(fp, "{ w = %d, h = %d, u = { %.10f, %.10f }, v = { %.10f, %.10f } }\n", width, height, min_x, min_y, max_x, max_y);
 		}
 	}
 
