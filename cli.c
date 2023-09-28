@@ -364,7 +364,10 @@ int main(int argc, char** argv)
         return 0;
     }
 
-    if (argc == 2 && str_prefix("help", argv[1])) {
+    if (argc == 2
+        && (str_prefix("help", argv[1])
+            || strcmp(argv[1], "-h") == 0
+            || strcmp(argv[1], "--help") == 0)) {
         help();
         return 0;
     }
