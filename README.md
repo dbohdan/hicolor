@@ -36,7 +36,7 @@ usage:
   hicolor (encode|decode|quantize) [options] src [dest]
   hicolor info file
   hicolor version
-  hicolor help
+  hicolor (help|-h|--help)
 
 options:
   -5, --15-bit     15-bit color

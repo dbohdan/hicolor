@@ -303,7 +303,7 @@ void usage(FILE* output)
         "  hicolor (encode|decode|quantize) [options] src [dest]\n"
         "  hicolor info file\n"
         "  hicolor version\n"
-        "  hicolor help\n"
+        "  hicolor (help|-h|--help)\n"
     );
 }
 
