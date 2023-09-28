@@ -295,10 +295,10 @@ clean_up_file:
     return success;
 }
 
-void usage()
+void usage(FILE* output)
 {
     fprintf(
-        stderr,
+        output,
         "usage:\n"
         "  hicolor (encode|decode|quantize) [options] src [dest]\n"
         "  hicolor info file\n"
@@ -310,12 +310,13 @@ void usage()
 void help()
 {
     fprintf(
-        stderr,
+        stdout,
         "HiColor\n"
         "Create 15/16-bit color RGB images.\n\n"
     );
-    usage();
-    fprintf(stderr,
+    usage(stdout);
+    fprintf(
+        stdout,
         "\noptions:\n"
         "  -5, --15-bit     15-bit color\n"
         "  -6, --16-bit     16-bit color\n"
@@ -374,7 +375,7 @@ int main(int argc, char** argv)
 
     if (argc < 3) {
         fprintf(stderr, "too few arguments\n");
-        usage();
+        usage(stderr);
         return 1;
     }
 
@@ -388,7 +389,7 @@ int main(int argc, char** argv)
         opt_command = QUANTIZE;
     } else {
         fprintf(stderr, "invalid command\n");
-        usage();
+        usage(stderr);
         return 1;
     }
     i++;
@@ -413,7 +414,7 @@ int main(int argc, char** argv)
 
     if (i >= argc) {
         fprintf(stderr, "too few arguments\n");
-        usage();
+        usage(stderr);
         return 1;
     }
 
@@ -435,7 +436,7 @@ int main(int argc, char** argv)
 
     if (i < argc) {
         fprintf(stderr, "too many arguments\n");
-        usage();
+        usage(stderr);
         return 1;
     }
 
