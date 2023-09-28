@@ -56,7 +56,17 @@ tcltest::test version-2.1 {} -body {
 
 
 tcltest::test help-1.1 {} -body {
-    hicolor help 2>@1
+    hicolor help
+} -match glob -result *usage:*
+
+
+tcltest::test help-1.2 {} -body {
+    hicolor -h
+} -match glob -result *usage:*
+
+
+tcltest::test help-1.3 {} -body {
+    hicolor --help
 } -match glob -result *usage:*
 
 
