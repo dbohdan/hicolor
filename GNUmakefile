@@ -18,8 +18,7 @@ install-include: hicolor.h
 	install -m 0644 $< $(DESTDIR)$(PREFIX)/include
 
 release: clean test test-wine
-	strip hicolor hicolor.exe
-	cp hicolor hicolor-v"$$(./hicolor version)"-linux-x86_64
+	cp hicolor hicolor-v"$$(./hicolor version)"-"$$(uname | tr 'A-Z' 'a-z')"-"$$(uname -m)"
 	cp hicolor.exe hicolor-v"$$(./hicolor version)"-win32.exe
 
 test: all
