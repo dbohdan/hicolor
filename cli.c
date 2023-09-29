@@ -111,7 +111,7 @@ bool png_to_hicolor(
     if (hi_file == NULL) {
         fprintf(
             stderr,
-            HICOLOR_CLI_ERROR "can't open destination \"%s\" for writing\n",
+            HICOLOR_CLI_ERROR "can't open file \"%s\" for writing\n",
             dest
         );
         return false;
