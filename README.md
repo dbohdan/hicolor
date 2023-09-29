@@ -29,14 +29,20 @@ HiColor has a Git-style CLI.
 The actions `encode` and `decode` convert images between PNG and HiColor's own image format.  `quantize` round-trips an image through the converter and outputs a normal PNG.  Use it to create images that look high-color but aren't.  `info` displays information about a HiColor file: version (`5` for 15-bit or `6` for 16), width, and height.
 
 ```none
-HiColor
+HiColor 0.4.0
 Create 15/16-bit color RGB images.
 
 usage:
-  hicolor (encode|decode|quantize) [options] src [dest]
-  hicolor info file
-  hicolor version
-  hicolor (help|-h|--help)
+  hicolor (encode|quantize) [-5|-6] [-n] [--] <src> [<dest>]
+  hicolor (decode <src> [<dest>]|info <file>|version|help|-h|--help)
+
+commands:
+  encode           convert PNG to HiColor
+  decode           convert HiColor to PNG
+  quantize         quantize PNG to PNG
+  info             print file version and resolution
+  version          print program version
+  help             print this help message
 
 options:
   -5, --15-bit     15-bit color

@@ -327,8 +327,8 @@ void usage(FILE* output)
     fprintf(
         output,
         "usage:\n"
-        "  hicolor (encode|decode|quantize) [-5|-6] [-n] <src> [<dest>]\n"
-        "  hicolor (info <file>|version|help|-h|--help)\n"
+        "  hicolor (encode|quantize) [-5|-6] [-n] [--] <src> [<dest>]\n"
+        "  hicolor (decode <src> [<dest>]|info <file>|version|help|-h|--help)\n"
     );
 }
 
@@ -381,7 +381,7 @@ bool str_prefix(const char* ref, const char* str)
 }
 
 typedef enum command {
-    ENCODE, DECODE, QUANTIZE
+    ENCODE, DECODE, QUANTIZE, INFO, VERSION
 } command;
 
 int main(int argc, char** argv)
@@ -389,30 +389,22 @@ int main(int argc, char** argv)
     command opt_command = ENCODE;
     bool opt_dither = true;
     hicolor_version opt_version = HICOLOR_VERSION_6;
-    char* opt_src;
-    char* opt_dest;
+    char* arg_src;
+    char* arg_dest;
+    bool allow_opts = true;
+    int min_pos_args = 1;
+    int max_pos_args = 2;
 
-    if (argc == 2 && str_prefix("version", argv[1])) {
-        version();
-        return 0;
+    if (argc <= 1) {
+        help();
+        return 1;
     }
 
-    if (argc == 2
-        && (str_prefix("help", argv[1])
-            || strcmp(argv[1], "-h") == 0
-            || strcmp(argv[1], "--help") == 0)) {
+    if (str_prefix("help", argv[1])
+        || strcmp(argv[1], "-h") == 0
+        || strcmp(argv[1], "--help") == 0) {
         help();
         return 0;
-    }
-
-    if (argc == 3 && str_prefix("info", argv[1])) {
-        return !hicolor_print_info(argv[2]);
-    }
-
-    if (argc < 3) {
-        fprintf(stderr, HICOLOR_CLI_ERROR "too few arguments\n");
-        usage(stderr);
-        return 1;
     }
 
     int i = 1;
@@ -420,68 +412,88 @@ int main(int argc, char** argv)
     if (str_prefix("encode", argv[i])) {
         opt_command = ENCODE;
     } else if (str_prefix("decode", argv[i])) {
+        allow_opts = false;
         opt_command = DECODE;
     } else if (str_prefix("quantize", argv[i])) {
         opt_command = QUANTIZE;
+    } else if (str_prefix("info", argv[i])) {
+        allow_opts = false;
+        max_pos_args = 1;
+        opt_command = INFO;
+    } else if (str_prefix("version", argv[i])) {
+        allow_opts = false;
+        min_pos_args = 0;
+        max_pos_args = 0;
+        opt_command = VERSION;
     } else {
         fprintf(stderr, HICOLOR_CLI_ERROR "invalid command\n");
         usage(stderr);
         return 1;
     }
+
     i++;
 
-    while (i < argc && argv[i][0] == '-') {
-        if (strcmp(argv[i], "--") == 0) {
-            i++;
-            break;
-        } else if (strcmp(argv[i], "-5") == 0
-            || strcmp(argv[i], "--15-bit") == 0) {
-            opt_version = HICOLOR_VERSION_5;
-        } else if (strcmp(argv[i], "-6") == 0
-            || strcmp(argv[i], "--16-bit") == 0) {
-            opt_version = HICOLOR_VERSION_6;
-        } else if (strcmp(argv[i], "-n") == 0
-            || strcmp(argv[i], "--no-dither") == 0) {
-            opt_dither = false;
-        }
+    if (allow_opts) {
+        while (i < argc && argv[i][0] == '-') {
+            if (strcmp(argv[i], "--") == 0) {
+                i++;
+                break;
+            } else if (strcmp(argv[i], "-5") == 0
+                || strcmp(argv[i], "--15-bit") == 0) {
+                opt_version = HICOLOR_VERSION_5;
+            } else if (strcmp(argv[i], "-6") == 0
+                || strcmp(argv[i], "--16-bit") == 0) {
+                opt_version = HICOLOR_VERSION_6;
+            } else if (strcmp(argv[i], "-n") == 0
+                || strcmp(argv[i], "--no-dither") == 0) {
+                opt_dither = false;
+            }
 
-        i++;
+            i++;
+        }
     }
 
-    if (i >= argc) {
+    int rem_args = argc - i;
+
+    if (rem_args < min_pos_args) {
         fprintf(stderr, HICOLOR_CLI_ERROR "too few arguments\n");
         usage(stderr);
         return 1;
     }
 
-    opt_src = argv[i];
-    i++;
-
-    if (i == argc) {
-        opt_dest = malloc(strlen(opt_src) + 5);
-        if (opt_dest == NULL) return HICOLOR_CLI_NO_MEMORY_EXIT_CODE;
-        sprintf(
-            opt_dest,
-            opt_command == ENCODE ? "%s.hic" : "%s.png",
-            opt_src
-        );
-    } else {
-        opt_dest = argv[i];
-    }
-    i++;
-
-    if (i < argc) {
+    if (rem_args > max_pos_args) {
         fprintf(stderr, HICOLOR_CLI_ERROR "too many arguments\n");
         usage(stderr);
         return 1;
     }
 
+    arg_src = argv[i];
+    i++;
+
+    if (i == argc) {
+        arg_dest = malloc(strlen(arg_src) + 5);
+        if (arg_dest == NULL) return HICOLOR_CLI_NO_MEMORY_EXIT_CODE;
+        sprintf(
+            arg_dest,
+            opt_command == ENCODE ? "%s.hic" : "%s.png",
+            arg_src
+        );
+    } else {
+        arg_dest = argv[i];
+    }
+    i++;
+
     switch (opt_command) {
     case ENCODE:
-        return !png_to_hicolor(opt_version, opt_dither, opt_src, opt_dest);
+        return !png_to_hicolor(opt_version, opt_dither, arg_src, arg_dest);
     case DECODE:
-        return !hicolor_to_png(opt_src, opt_dest);
+        return !hicolor_to_png(arg_src, arg_dest);
     case QUANTIZE:
-        return !png_quantize(opt_version, opt_dither, opt_src, opt_dest);
+        return !png_quantize(opt_version, opt_dither, arg_src, arg_dest);
+    case INFO:
+        return !hicolor_print_info(arg_src);
+    case VERSION:
+        version();
+        return 0;
     }
 }

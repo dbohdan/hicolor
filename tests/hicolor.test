@@ -43,6 +43,10 @@ tcltest::test version-1.1 {} -body {
     hicolor version
 } -match regexp -result {\d+\.\d+\.\d+}
 
+tcltest::test version-1.2 {} -body {
+    hicolor version file.hi5
+} -returnCodes error -match glob -result {*too many arg*}
+
 tcltest::test version-2.1 {} -body {
     set action version
     set output [hicolor $action]
@@ -57,17 +61,17 @@ tcltest::test version-2.1 {} -body {
 
 tcltest::test help-1.1 {} -body {
     hicolor help
-} -match glob -result *usage:*
+} -match glob -result *options:*
 
 
 tcltest::test help-1.2 {} -body {
     hicolor -h
-} -match glob -result *usage:*
+} -match glob -result *options:*
 
 
 tcltest::test help-1.3 {} -body {
     hicolor --help
-} -match glob -result *usage:*
+} -match glob -result *options:*
 
 
 tcltest::test encode-1.1 {} -body {
@@ -129,6 +133,11 @@ tcltest::test encode-2.7 {encode flags} -body {
     hicolor encode -n -n -n -n -n photo.png
 } -result {}
 
+tcltest::test encode-2.8 {encode flags} -body {
+    hicolor encode -6 -n -5 photo.png
+    hicolor info photo.png.hic
+} -result {5 640 427}
+
 
 tcltest::test encode-3.1 {bad input} -body {
     hicolor encode truncated.png
@@ -157,6 +166,10 @@ tcltest::test decode-1.3 {bad input} -body {
     hicolor decode [file tail [info script]]
 } -returnCodes error -match glob -result {*bad magic*}
 
+tcltest::test decode-1.4 {bad input} -body {
+    hicolor decode -5 photo.hi5
+} -returnCodes error -match glob -result *error:*
+
 
 tcltest::test quantize-1.1 {} -body {
     hicolor quantize photo.png photo.16-bit.png
@@ -179,6 +192,26 @@ tcltest::test quantize-2.2 {bad input} -body {
 tcltest::test quantize-2.3 {bad input} -body {
     hicolor quantize wrong-size.png
 } -returnCodes error -match glob -result {error: can't load PNG file*}
+
+
+tcltest::test invalid-command-1.1 {} -body {
+    hicolor -5 src.png
+} -returnCodes error -match glob -result {error: invalid command*}
+
+tcltest::test invalid-command-1.2 {} -body {
+    hicolor encoder
+} -returnCodes error -match glob -result {error: invalid command*}
+
+
+tcltest::test no-arguments-1.1 {} -body {
+    hicolor
+} -returnCodes error -match glob -result *options:*
+
+
+tcltest::test dash-dash-1.1 {} -body {
+    hicolor encode -- --no-such-file
+} -returnCodes error -match glob -result {error: source image "--no-such-file"\
+    doesn't exist}
 
 
 tcltest::test data-integrity-1.1 {roundtrip} -constraints gm -body {
