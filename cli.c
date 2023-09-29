@@ -67,6 +67,21 @@ cp_image_t rgb_to_cp(const hicolor_metadata meta, const hicolor_rgb* rgb_img)
     return img;
 }
 
+bool check_src_exists(
+    const char* src
+) {
+    if (access(src, F_OK) != 0) {
+        fprintf(
+            stderr,
+            HICOLOR_CLI_ERROR "source image \"%s\" doesn't exist\n",
+            src
+        );
+        return false;
+    }
+
+    return true;
+}
+
 bool png_to_hicolor(
     hicolor_version version,
     bool dither,
@@ -76,12 +91,8 @@ bool png_to_hicolor(
 {
     hicolor_result res;
 
-    if (access(src, F_OK) != 0) {
-        fprintf(
-            stderr,
-            HICOLOR_CLI_ERROR "source image \"%s\" doesn't exist\n",
-            src
-        );
+    bool exists = check_src_exists(src);
+    if (!exists) {
         return false;
     }
 
@@ -159,12 +170,8 @@ bool png_quantize(
 {
     hicolor_result res;
 
-    if (access(src, F_OK) != 0) {
-        fprintf(
-            stderr,
-            HICOLOR_CLI_ERROR "source image \"%s\" doesn't exist\n",
-            src
-        );
+    bool exists = check_src_exists(src);
+    if (!exists) {
         return false;
     }
 
@@ -231,6 +238,11 @@ bool hicolor_to_png(
 {
     hicolor_result res;
 
+    bool exists = check_src_exists(src);
+    if (!exists) {
+        return false;
+    }
+
     FILE* hi_file = fopen(src, "rb");
     if (hi_file == NULL) {
         fprintf(
@@ -283,6 +295,11 @@ bool hicolor_print_info(
 )
 {
     hicolor_result res;
+
+    bool exists = check_src_exists(src);
+    if (!exists) {
+        return false;
+    }
 
     FILE* hi_file = fopen(src, "rb");
     if (hi_file == NULL) {
@@ -357,7 +374,7 @@ void help()
         "  encode           convert PNG to HiColor\n"
         "  decode           convert HiColor to PNG\n"
         "  quantize         quantize PNG to PNG\n"
-        "  info             print file version and resolution\n"
+        "  info             print HiColor image version and resolution\n"
         "  version          print program version\n"
         "  help             print this help message\n"
         "\noptions:\n"

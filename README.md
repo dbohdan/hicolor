@@ -40,7 +40,7 @@ commands:
   encode           convert PNG to HiColor
   decode           convert HiColor to PNG
   quantize         quantize PNG to PNG
-  info             print file version and resolution
+  info             print HiColor image version and resolution
   version          print program version
   help             print this help message
 
