@@ -300,27 +300,8 @@ void usage(FILE* output)
     fprintf(
         output,
         "usage:\n"
-        "  hicolor (encode|decode|quantize) [options] src [dest]\n"
-        "  hicolor info file\n"
-        "  hicolor version\n"
-        "  hicolor (help|-h|--help)\n"
-    );
-}
-
-void help()
-{
-    fprintf(
-        stdout,
-        "HiColor\n"
-        "Create 15/16-bit color RGB images.\n\n"
-    );
-    usage(stdout);
-    fprintf(
-        stdout,
-        "\noptions:\n"
-        "  -5, --15-bit     15-bit color\n"
-        "  -6, --16-bit     16-bit color\n"
-        "  -n, --no-dither  Do not dither the image\n"
+        "  hicolor (encode|decode|quantize) [-5|-6] [-n] <src> [<dest>]\n"
+        "  hicolor (info <file>|version|help|-h|--help)\n"
     );
 }
 
@@ -331,6 +312,31 @@ void version() {
         version / 10000,
         version % 10000 / 100,
         version % 100
+    );
+}
+
+void help()
+{
+    printf(
+        "HiColor "
+    );
+    version();
+    printf(
+        "Create 15/16-bit color RGB images.\n\n"
+    );
+    usage(stdout);
+    printf(
+        "\ncommands:\n"
+        "  encode           convert PNG to HiColor\n"
+        "  decode           convert HiColor to PNG\n"
+        "  quantize         quantize PNG to PNG\n"
+        "  info             print file version and resolution\n"
+        "  version          print program version\n"
+        "  help             print this help message\n"
+        "\noptions:\n"
+        "  -5, --15-bit     15-bit color\n"
+        "  -6, --16-bit     16-bit color\n"
+        "  -n, --no-dither  Do not dither the image\n"
     );
 }
 
