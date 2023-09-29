@@ -12,6 +12,7 @@
 #define HICOLOR_IMPLEMENTATION
 #include "hicolor.h"
 
+#define HICOLOR_CLI_ERROR "error: "
 #define HICOLOR_CLI_NO_MEMORY_EXIT_CODE 255
 
 bool check_and_report_error(char* step, hicolor_result res)
@@ -20,7 +21,7 @@ bool check_and_report_error(char* step, hicolor_result res)
 
     fprintf(
         stderr,
-        "%s: %s\n",
+        HICOLOR_CLI_ERROR "%s: %s\n",
         step,
         hicolor_error_message(res)
     );
@@ -76,7 +77,11 @@ bool png_to_hicolor(
     hicolor_result res;
 
     if (access(src, F_OK) != 0) {
-        fprintf(stderr, "source image \"%s\" doesn't exist\n", src);
+        fprintf(
+            stderr,
+            HICOLOR_CLI_ERROR "source image \"%s\" doesn't exist\n",
+            src
+        );
         return false;
     }
 
@@ -84,7 +89,7 @@ bool png_to_hicolor(
     if (png_img.pix == 0) {
         fprintf(
             stderr,
-            "can't load PNG file \"%s\": %s\n",
+            HICOLOR_CLI_ERROR "can't load PNG file \"%s\": %s\n",
             src,
             cp_error_reason
         );
@@ -93,7 +98,11 @@ bool png_to_hicolor(
 
     FILE* hi_file = fopen(dest, "wb");
     if (hi_file == NULL) {
-        fprintf(stderr, "can't open destination \"%s\" for writing\n", dest);
+        fprintf(
+            stderr,
+            HICOLOR_CLI_ERROR "can't open destination \"%s\" for writing\n",
+            dest
+        );
         return false;
     }
 
@@ -110,7 +119,10 @@ bool png_to_hicolor(
 
     hicolor_rgb* rgb_img = cp_to_rgb(png_img);
     if (rgb_img == NULL) {
-        fprintf(stderr, "can't allocate memory for RGB image\n");
+        fprintf(
+            stderr,
+            HICOLOR_CLI_ERROR "can't allocate memory for RGB image\n"
+        );
         goto clean_up_file;
     }
 
@@ -148,7 +160,11 @@ bool png_quantize(
     hicolor_result res;
 
     if (access(src, F_OK) != 0) {
-        fprintf(stderr, "source image \"%s\" doesn't exist\n", src);
+        fprintf(
+            stderr,
+            HICOLOR_CLI_ERROR "source image \"%s\" doesn't exist\n",
+            src
+        );
         return false;
     }
 
@@ -156,7 +172,7 @@ bool png_quantize(
     if (png_img.pix == 0) {
         fprintf(
             stderr,
-            "can't load PNG file \"%s\": %s\n",
+            HICOLOR_CLI_ERROR "can't load PNG file \"%s\": %s\n",
             src,
             cp_error_reason
         );
@@ -171,7 +187,10 @@ bool png_quantize(
 
     hicolor_rgb* rgb_img = cp_to_rgb(png_img);
     if (rgb_img == NULL) {
-        fprintf(stderr, "can't allocate memory for RGB image\n");
+        fprintf(
+            stderr,
+            HICOLOR_CLI_ERROR "can't allocate memory for RGB image\n"
+        );
         return false;
     }
 
@@ -187,7 +206,7 @@ bool png_quantize(
         quant_png_img.pix[i].a = png_img.pix[i].a;
     }
     if (!cp_save_png(dest, &quant_png_img)) {
-        fprintf(stderr, "can't save PNG\n");
+        fprintf(stderr, HICOLOR_CLI_ERROR "can't save PNG\n");
         goto clean_up_quant_image;
     }
 
@@ -214,7 +233,11 @@ bool hicolor_to_png(
 
     FILE* hi_file = fopen(src, "rb");
     if (hi_file == NULL) {
-        fprintf(stderr, "can't open source image \"%s\" for reading\n", src);
+        fprintf(
+            stderr,
+            HICOLOR_CLI_ERROR "can't open source image \"%s\" for reading\n",
+            src
+        );
         return false;
     }
 
@@ -237,7 +260,7 @@ bool hicolor_to_png(
 
     cp_image_t png_img = rgb_to_cp(meta, rgb_img);
     if (!cp_save_png(dest, &png_img)) {
-        fprintf(stderr, "can't save PNG\n");
+        fprintf(stderr, HICOLOR_CLI_ERROR "can't save PNG\n");
         goto clean_up_png_image;
     }
 
@@ -263,7 +286,11 @@ bool hicolor_print_info(
 
     FILE* hi_file = fopen(src, "rb");
     if (hi_file == NULL) {
-        fprintf(stderr, "can't open source image \"%s\" for reading\n", src);
+        fprintf(
+            stderr,
+            HICOLOR_CLI_ERROR "can't open source image \"%s\" for reading\n",
+            src
+        );
         return false;
     }
 
@@ -383,7 +410,7 @@ int main(int argc, char** argv)
     }
 
     if (argc < 3) {
-        fprintf(stderr, "too few arguments\n");
+        fprintf(stderr, HICOLOR_CLI_ERROR "too few arguments\n");
         usage(stderr);
         return 1;
     }
@@ -397,7 +424,7 @@ int main(int argc, char** argv)
     } else if (str_prefix("quantize", argv[i])) {
         opt_command = QUANTIZE;
     } else {
-        fprintf(stderr, "invalid command\n");
+        fprintf(stderr, HICOLOR_CLI_ERROR "invalid command\n");
         usage(stderr);
         return 1;
     }
@@ -422,7 +449,7 @@ int main(int argc, char** argv)
     }
 
     if (i >= argc) {
-        fprintf(stderr, "too few arguments\n");
+        fprintf(stderr, HICOLOR_CLI_ERROR "too few arguments\n");
         usage(stderr);
         return 1;
     }
@@ -444,7 +471,7 @@ int main(int argc, char** argv)
     i++;
 
     if (i < argc) {
-        fprintf(stderr, "too many arguments\n");
+        fprintf(stderr, HICOLOR_CLI_ERROR "too many arguments\n");
         usage(stderr);
         return 1;
     }

@@ -132,12 +132,12 @@ tcltest::test encode-2.7 {encode flags} -body {
 
 tcltest::test encode-3.1 {bad input} -body {
     hicolor encode truncated.png
-} -returnCodes error -result {can't load PNG file "truncated.png": corrupt\
-    zlib structure in DEFLATE stream}
+} -returnCodes error -result {error: can't load PNG file "truncated.png":\
+    corrupt zlib structure in DEFLATE stream}
 
 tcltest::test encode-3.2 {bad input} -body {
     hicolor encode wrong-size.png
-} -returnCodes error -match glob -result {can't load PNG file*}
+} -returnCodes error -match glob -result {error: can't load PNG file*}
 
 
 hicolor encode --15-bit photo.png photo.hi5
@@ -173,12 +173,12 @@ tcltest::test quantize-2.1 {bad input} -body {
 
 tcltest::test quantize-2.2 {bad input} -body {
     hicolor quantize truncated.png
-} -returnCodes error -result {can't load PNG file "truncated.png": corrupt\
-    zlib structure in DEFLATE stream}
+} -returnCodes error -result {error: can't load PNG file "truncated.png":\
+    corrupt zlib structure in DEFLATE stream}
 
 tcltest::test quantize-2.3 {bad input} -body {
     hicolor quantize wrong-size.png
-} -returnCodes error -match glob -result {can't load PNG file*}
+} -returnCodes error -match glob -result {error: can't load PNG file*}
 
 
 tcltest::test data-integrity-1.1 {roundtrip} -constraints gm -body {
