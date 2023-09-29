@@ -56,7 +56,7 @@ options:
 
 ```sh
 sudo apt install -y build-essential graphicsmagick tclsh
-make test
+gmake test
 ```
 
 ### Cross-compiling for Windows
@@ -65,10 +65,10 @@ The following commands build a 32-bit executable for Windows.
 
 ```sh
 sudo apt install -y build-essential gcc-mingw-w64-i686
-make hicolor.exe
+gmake hicolor.exe
 # Wine, Tcl, and GraphicsMagick are needed only for testing.
 sudo apt install -y graphicsmagick tclsh wine
-make test-wine
+gmake test-wine
 ```
 
 ## License
