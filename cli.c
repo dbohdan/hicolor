@@ -380,7 +380,7 @@ void help()
         "\noptions:\n"
         "  -5, --15-bit     15-bit color\n"
         "  -6, --16-bit     16-bit color\n"
-        "  -n, --no-dither  Do not dither the image\n"
+        "  -n, --no-dither  do not dither the image\n"
     );
 }
 
