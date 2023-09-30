@@ -21,8 +21,8 @@ release: clean test
 	cp hicolor hicolor-v"$$(./hicolor version)"-"$$(uname | tr 'A-Z' 'a-z')"-"$$(uname -m)"
 
 test: all
-	./tests/hicolor.test
+	tests/hicolor.test
 test-wine: hicolor.exe
-	HICOLOR_COMMAND='wine ../hicolor.exe' WINEDEBUG=-all ./tests/hicolor.test
+	HICOLOR_COMMAND='wine ../hicolor.exe' WINEDEBUG=-all tests/hicolor.test
 
 .PHONY: all clean install-bin install-include test test-wine

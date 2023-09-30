@@ -345,7 +345,9 @@ void usage(FILE* output)
         output,
         "usage:\n"
         "  hicolor (encode|quantize) [-5|-6] [-n] [--] <src> [<dest>]\n"
-        "  hicolor (decode <src> [<dest>]|info <file>|version|help|-h|--help)\n"
+        "  hicolor decode <src> [<dest>]\n"
+        "  hicolor info <file>\n"
+        "  hicolor (version|help|-h|--help)\n"
     );
 }
 
