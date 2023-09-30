@@ -34,7 +34,9 @@ Create 15/16-bit color RGB images.
 
 usage:
   hicolor (encode|quantize) [-5|-6] [-n] [--] <src> [<dest>]
-  hicolor (decode <src> [<dest>]|info <file>|version|help|-h|--help)
+  hicolor decode <src> [<dest>]
+  hicolor info <file>
+  hicolor (version|help|-h|--help)
 
 commands:
   encode           convert PNG to HiColor
