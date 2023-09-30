@@ -407,7 +407,7 @@ bool str_prefix(const char* ref, const char* str)
 }
 
 typedef enum command {
-    ENCODE, DECODE, QUANTIZE, INFO, VERSION
+    ENCODE, DECODE, QUANTIZE, INFO, VERSION, HELP
 } command;
 
 int main(int argc, char** argv)
@@ -427,8 +427,8 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    if (str_prefix(HICOLOR_CLI_CMD_HELP, argv[1])
-        || strcmp(argv[1], "-h") == 0
+    /* The regular "help" command is handled later with other commands. */
+    if (strcmp(argv[1], "-h") == 0
         || strcmp(argv[1], "--help") == 0) {
         help();
         return 0;
@@ -457,6 +457,12 @@ int main(int argc, char** argv)
         min_pos_args = 0;
         max_pos_args = 0;
         opt_command = VERSION;
+    } else if (str_prefix(HICOLOR_CLI_CMD_HELP, argv[i])) {
+        allow_opts = false;
+        command_name = HICOLOR_CLI_CMD_HELP;
+        min_pos_args = 0;
+        max_pos_args = 0;
+        opt_command = HELP;
     } else {
         fprintf(
             stderr,
@@ -538,6 +544,9 @@ int main(int argc, char** argv)
         return !hicolor_print_info(arg_src);
     case VERSION:
         version();
+        return 0;
+    case HELP:
+        help();
         return 0;
     }
 }
