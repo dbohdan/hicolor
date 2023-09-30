@@ -196,11 +196,11 @@ tcltest::test quantize-2.3 {bad input} -body {
 
 tcltest::test invalid-command-1.1 {} -body {
     hicolor -5 src.png
-} -returnCodes error -match glob -result {error: invalid command*}
+} -returnCodes error -match glob -result {error: invalid command "-5"*}
 
 tcltest::test invalid-command-1.2 {} -body {
     hicolor encoder
-} -returnCodes error -match glob -result {error: invalid command*}
+} -returnCodes error -match glob -result {error: invalid command "encoder"*}
 
 
 tcltest::test no-arguments-1.1 {} -body {

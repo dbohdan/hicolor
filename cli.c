@@ -445,7 +445,11 @@ int main(int argc, char** argv)
         max_pos_args = 0;
         opt_command = VERSION;
     } else {
-        fprintf(stderr, HICOLOR_CLI_ERROR "invalid command\n");
+        fprintf(
+            stderr,
+            HICOLOR_CLI_ERROR "invalid command \"%s\"\n",           argv[i]
+
+        );
         usage(stderr);
         return 1;
     }
