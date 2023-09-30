@@ -19,7 +19,7 @@
 #include <stdio.h>
 
 #define HICOLOR_BAYER_SIZE 8
-#define HICOLOR_LIBRARY_VERSION 400
+#define HICOLOR_LIBRARY_VERSION 500
 
 /* Types. */
 
