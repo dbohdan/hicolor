@@ -195,13 +195,18 @@ tcltest::test quantize-2.3 {bad input} -body {
 } -returnCodes error -match glob -result {error: can't load PNG file*}
 
 
-tcltest::test invalid-command-1.1 {} -body {
+tcltest::test unknown-command-1.1 {} -body {
     hicolor -5 src.png
-} -returnCodes error -match glob -result {error: invalid command "-5"*}
+} -returnCodes error -match glob -result {error: unknown command "-5"*}
 
-tcltest::test invalid-command-1.2 {} -body {
+tcltest::test unknown-command-1.2 {} -body {
     hicolor encoder
-} -returnCodes error -match glob -result {error: invalid command "encoder"*}
+} -returnCodes error -match glob -result {error: unknown command "encoder"*}
+
+
+tcltest::test unknown-option-1.1 {} -body {
+    hicolor encode --wrong fo bar
+} -returnCodes error -match glob -result {error: unknown option "--wrong"*}
 
 
 tcltest::test no-arguments-1.1 {} -body {

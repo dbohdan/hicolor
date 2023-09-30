@@ -427,11 +427,13 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    /* The regular "help" command is handled later with other commands. */
-    if (strcmp(argv[1], "-h") == 0
-        || strcmp(argv[1], "--help") == 0) {
-        help();
-        return 0;
+    /* The regular "help" command is handled later with the rest. */
+    for (int i = 0; i < argc; i++) {
+        if (strcmp(argv[i], "-h") == 0
+            || strcmp(argv[i], "--help") == 0) {
+            help();
+            return 0;
+        }
     }
 
     int i = 1;
@@ -466,7 +468,8 @@ int main(int argc, char** argv)
     } else {
         fprintf(
             stderr,
-            HICOLOR_CLI_ERROR "invalid command \"%s\"\n",           argv[i]
+            HICOLOR_CLI_ERROR "unknown command \"%s\"\n",
+            argv[i]
 
         );
         usage(stderr);
@@ -489,6 +492,15 @@ int main(int argc, char** argv)
             } else if (strcmp(argv[i], "-n") == 0
                 || strcmp(argv[i], "--no-dither") == 0) {
                 opt_dither = false;
+            } else {
+                fprintf(
+                    stderr,
+                    HICOLOR_CLI_ERROR "unknown option \"%s\"\n",
+                    argv[i]
+                );
+                usage(stderr);
+                return 1;
+
             }
 
             i++;
