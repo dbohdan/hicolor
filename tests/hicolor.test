@@ -76,7 +76,8 @@ tcltest::test help-1.3 {} -body {
 
 tcltest::test encode-1.1 {} -body {
     hicolor encode
-} -returnCodes error -match glob -result {*too few arg*}
+} -returnCodes error -match glob -result {*no source image given to command\
+    "encode"*}
 
 tcltest::test encode-1.2 {} -body {
     hicolor encode photo.png

@@ -15,6 +15,13 @@
 #define HICOLOR_CLI_ERROR "error: "
 #define HICOLOR_CLI_NO_MEMORY_EXIT_CODE 255
 
+#define HICOLOR_CLI_CMD_ENCODE "encode"
+#define HICOLOR_CLI_CMD_QUANTIZE "quantize"
+#define HICOLOR_CLI_CMD_DECODE "decode"
+#define HICOLOR_CLI_CMD_INFO "info"
+#define HICOLOR_CLI_CMD_VERSION "version"
+#define HICOLOR_CLI_CMD_HELP "help"
+
 bool check_and_report_error(char* step, hicolor_result res)
 {
     if (res == HICOLOR_OK) return false;
@@ -408,6 +415,7 @@ int main(int argc, char** argv)
     command opt_command = ENCODE;
     bool opt_dither = true;
     hicolor_version opt_version = HICOLOR_VERSION_6;
+    const char* command_name;
     char* arg_src;
     char* arg_dest;
     bool allow_opts = true;
@@ -419,7 +427,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    if (str_prefix("help", argv[1])
+    if (str_prefix(HICOLOR_CLI_CMD_HELP, argv[1])
         || strcmp(argv[1], "-h") == 0
         || strcmp(argv[1], "--help") == 0) {
         help();
@@ -428,19 +436,24 @@ int main(int argc, char** argv)
 
     int i = 1;
 
-    if (str_prefix("encode", argv[i])) {
+    if (str_prefix(HICOLOR_CLI_CMD_ENCODE, argv[i])) {
+        command_name = HICOLOR_CLI_CMD_ENCODE;
         opt_command = ENCODE;
-    } else if (str_prefix("decode", argv[i])) {
+    } else if (str_prefix(HICOLOR_CLI_CMD_DECODE, argv[i])) {
         allow_opts = false;
+        command_name = HICOLOR_CLI_CMD_DECODE;
         opt_command = DECODE;
-    } else if (str_prefix("quantize", argv[i])) {
+    } else if (str_prefix(HICOLOR_CLI_CMD_QUANTIZE, argv[i])) {
+        command_name = HICOLOR_CLI_CMD_QUANTIZE;
         opt_command = QUANTIZE;
-    } else if (str_prefix("info", argv[i])) {
+    } else if (str_prefix(HICOLOR_CLI_CMD_INFO, argv[i])) {
         allow_opts = false;
+        command_name = HICOLOR_CLI_CMD_INFO;
         max_pos_args = 1;
         opt_command = INFO;
-    } else if (str_prefix("version", argv[i])) {
+    } else if (str_prefix(HICOLOR_CLI_CMD_VERSION, argv[i])) {
         allow_opts = false;
+        command_name = HICOLOR_CLI_CMD_VERSION;
         min_pos_args = 0;
         max_pos_args = 0;
         opt_command = VERSION;
@@ -479,13 +492,21 @@ int main(int argc, char** argv)
     int rem_args = argc - i;
 
     if (rem_args < min_pos_args) {
-        fprintf(stderr, HICOLOR_CLI_ERROR "too few arguments\n");
+        fprintf(
+            stderr,
+            HICOLOR_CLI_ERROR "no source image given to command \"%s\"\n",
+            command_name
+        );
         usage(stderr);
         return 1;
     }
 
     if (rem_args > max_pos_args) {
-        fprintf(stderr, HICOLOR_CLI_ERROR "too many arguments\n");
+        fprintf(
+            stderr,
+            HICOLOR_CLI_ERROR "too many arguments to command \"%s\"\n",
+            command_name
+        );
         usage(stderr);
         return 1;
     }
