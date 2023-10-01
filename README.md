@@ -1,32 +1,49 @@
 # HiColor
 
-![A building with a dithered gradient of the sky behind it.  A jet airplane is taking off in the sky.](bordeaux-15bit.png)
+![A building with a dithered gradient of the sky behind it.
+A jet airplane is taking off in the sky.](bordeaux-15bit.png)
 
 *(The image above has 15-bit color.)*
 
-HiColor is a program for converting images to 15- and 16-bit RGB color, the color depth of old display modes known as [&ldquo;high color&rdquo;](https://en.wikipedia.org/wiki/High_color).  In 15-bit mode images have 5 bits for each of red, green, and blue, and the last bit is reserved.  In 16-bit mode green, the color the human eye is generally most sensitive to, gets 6 bits.
+HiColor is a program for converting images to 15- and 16-bit RGB color, the color depth of old display modes known as [&ldquo;high color&rdquo;](https://en.wikipedia.org/wiki/High_color).
+In 15-bit mode images have 5 bits for each of red, green, and blue, and the last bit is reserved.
+In 16-bit mode green, the color the human eye is generally most sensitive to, gets 6 bits.
 
-I wrote this program because I wanted to create images with the characteristic high-color look, and nothing seemed to support high color.  It implements its own simple [file format](format.md) and converts between this format and PNG.  It can also convert normal PNG to normal 32-bit PNG with only high color color values.  (This simulates a roundtrip through HiColor without creating a temporary file.)  To reduce the quantization error (the difference between the original and the high-color pixel), HiColor uses the [Bayer ordered dithering](https://bisqwit.iki.fi/story/howto/dither/jy/#StandardOrderedDitheringAlgorithm) algorithm, which historical software and hardware used for dithering in high color modes.  Dithering can be disabled with a command line flag.  HiColor files have either the extension `.hic` or `.hi5` for 15-bit and `.hi6` for 16-bit respectively.
+I wrote this program because I wanted to create images with the characteristic high-color look, and nothing seemed to support high color.
+It implements its own simple [file format](format.md) and converts between this format and PNG.
+It can also convert normal PNG to normal 32-bit PNG with only high color color values.
+(This simulates a roundtrip through HiColor without creating a temporary file.)
+To reduce the quantization error (the difference between the original and the high-color pixel),
+HiColor uses the [Bayer ordered dithering](https://bisqwit.iki.fi/story/howto/dither/jy/#StandardOrderedDitheringAlgorithm) algorithm, which historical software and hardware used for dithering in high color modes.
+Dithering can be disabled with a command line flag.
+HiColor files have either the extension `.hic` or `.hi5` for 15-bit and `.hi6` for 16-bit respectively.
 
-Quantized images compress better when their originals, so HiColor may serve as a less-lossy alternative to the 256-color [pngquant](https://pngquant.org/).  Quantizing a PNG file to PNG preserves transparency (but does not quantize the alpha channel).  Conversion to and from the HiColor format does not preserve transparency.
+Quantized images compress better when their originals, so HiColor may serve as a less-lossy alternative to the 256-color [pngquant](https://pngquant.org/).
+Quantizing a PNG file to PNG preserves transparency (but does not quantize the alpha channel).
+Conversion to and from the HiColor format does not preserve transparency.
 
-The program is written in C with minimal dependencies and builds as a static binary by default.  It is known to work on Linux (aarch64, i386, riscv64, x86\_64), FreeBSD, NetBSD, OpenBSD, and Windows 98 Second Edition, 2000 Service Pack 4, XP, and 7.
+The program is written in C with minimal dependencies and builds as a static binary by default.
+It is known to work on Linux (aarch64, i386, riscv64, x86\_64), FreeBSD, NetBSD, OpenBSD, and Windows 98 Second Edition, 2000 Service Pack 4, XP, and 7.
 
 ## Known bugs and limitations
 
 ### PNG file size
 
-PNG files produced by HiColor are not optimized.  Run them through [OptiPNG](http://optipng.sourceforge.net/) or [Oxipng](https://github.com/shssoichiro/oxipng) to significantly reduce their size.
+PNG files produced by HiColor are not optimized.
+Run them through [OptiPNG](http://optipng.sourceforge.net/) or [Oxipng](https://github.com/shssoichiro/oxipng) to significantly reduce their size.
 
 ### Generation loss
 
-Fixed in version 0.3.0.
+Fixed for Bayer dithering in version 0.3.0.
 
 ## Usage
 
 HiColor has a Git-style CLI.
 
-The actions `encode` and `decode` convert images between PNG and HiColor's own image format.  `quantize` round-trips an image through the converter and outputs a normal PNG.  Use it to create images that look high-color but aren't.  `info` displays information about a HiColor file: version (`5` for 15-bit or `6` for 16), width, and height.
+The actions `encode` and `decode` convert images between PNG and HiColor's own image format.
+`quantize` round-trips an image through the converter and outputs a normal PNG.
+Use it to create images that look high-color but aren't.
+`info` displays information about a HiColor file: version (`5` for 15-bit or `6` for 16), width, and height.
 
 ```none
 HiColor 0.5.0
