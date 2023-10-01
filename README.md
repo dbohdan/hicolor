@@ -33,7 +33,7 @@ HiColor 0.5.0
 Create 15/16-bit color RGB images.
 
 usage:
-  hicolor (encode|quantize) [-5|-6] [-n] [--] <src> [<dest>]
+  hicolor (encode|quantize) [-5|-6] [-a|-b|-n] [--] <src> [<dest>]
   hicolor decode <src> [<dest>]
   hicolor info <file>
   hicolor (version|help|-h|--help)
@@ -49,7 +49,9 @@ commands:
 options:
   -5, --15-bit     15-bit color
   -6, --16-bit     16-bit color
-  -n, --no-dither  do not dither the image
+  -a, --a-dither   dither image with "a dither"
+  -b, --bayer      dither image with Bayer algorithm (default)
+  -n, --no-dither  do not dither image
 ```
 
 ## Building

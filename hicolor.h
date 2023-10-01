@@ -4,7 +4,7 @@
  * License: MIT.
  *
  * This header file contains both the interface and the implementation for
- * HiColor.  To instantiate the implementation put the line
+ * HiColor. To instantiate the implementation put the line
  *     #define HICOLOR_IMPLEMENTATION
  * in a single source code file of your project above where you include this
  * file.
@@ -36,7 +36,6 @@ static const double hicolor_bayer[HICOLOR_BAYER_SIZE * HICOLOR_BAYER_SIZE] = {
     42.0/64, 26.0/64, 38.0/64, 22.0/64, 41.0/64, 25.0/64, 37.0/64, 21.0/64
 };
 
-
 typedef enum hicolor_version {
     HICOLOR_VERSION_5,
     HICOLOR_VERSION_6
@@ -56,6 +55,12 @@ typedef enum hicolor_result {
     HICOLOR_INSUFFICIENT_DATA,
     HICOLOR_BAD_MAGIC
 } hicolor_result;
+
+typedef enum hicolor_dither {
+    HICOLOR_A_DITHER,
+    HICOLOR_BAYER,
+    HICOLOR_NO_DITHER
+} hicolor_dither;
 
 typedef struct hicolor_rgb {
     uint8_t r;
@@ -98,10 +103,10 @@ hicolor_result hicolor_write_header(
     const hicolor_metadata meta
 );
 
-/* Quantize using ordered (Bayer) dithering. */
+/* Quantize using optional dithering. */
 hicolor_result hicolor_quantize_rgb_image(
     const hicolor_metadata meta,
-    bool dither,
+    hicolor_dither dither,
     hicolor_rgb* image
 );
 
@@ -279,6 +284,39 @@ hicolor_result hicolor_write_header(
     return HICOLOR_IO_ERROR;
 }
 
+/* "a dither" is a public-domain dithering algorithm by Øyvind Kolås.
+ * This function implements pattern 3.
+ * https://pippin.gimp.org/a_dither/ */
+uint8_t hicolor_a_dither_channel(
+    uint8_t intensity,
+    uint16_t x,
+    uint16_t y,
+    double levels
+)
+{
+    double mask = (double) ((x + y * 237) * 119 & 255) / 255.0;
+    double normalized = (double) intensity / 255.0;
+    double dithered_normalized = floor(levels * normalized + mask) / levels;
+    return (uint8_t) (dithered_normalized * 255);
+}
+
+void hicolor_a_dither_rgb(
+    hicolor_version version,
+    uint16_t x,
+    uint16_t y,
+    const hicolor_rgb rgb,
+    hicolor_rgb* output
+)
+{
+    double levels = 32.0;
+    double levels_g = version == HICOLOR_VERSION_5 ? levels : 64.0;
+
+    output->r = hicolor_a_dither_channel(rgb.r, x, y, levels);
+    output->g = hicolor_a_dither_channel(rgb.g, x, y, levels_g);
+    output->b = hicolor_a_dither_channel(rgb.b, x, y, levels);
+}
+
+/* Ordered ("Bayer") dithering. */
 uint8_t hicolor_bayerize_channel(
     uint8_t intensity,
     double factor,
@@ -314,7 +352,7 @@ void hicolor_bayerize_rgb(
 
 hicolor_result hicolor_quantize_rgb_image(
     const hicolor_metadata meta,
-    bool dither,
+    hicolor_dither dither,
     hicolor_rgb* image
 )
 {
@@ -326,7 +364,9 @@ hicolor_result hicolor_quantize_rgb_image(
             rgb = image[y * meta.width + x];
 
             hicolor_rgb quant_rgb = rgb;
-            if (dither) {
+            if (dither == HICOLOR_A_DITHER) {
+                hicolor_a_dither_rgb(meta.version, x, y, rgb, &quant_rgb);
+            } else if (dither == HICOLOR_BAYER) {
                 hicolor_bayerize_rgb(meta.version, x, y, rgb, &quant_rgb);
             }
 

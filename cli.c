@@ -91,7 +91,7 @@ bool check_src_exists(
 
 bool png_to_hicolor(
     hicolor_version version,
-    bool dither,
+    hicolor_dither dither,
     const char* src,
     const char* dest
 )
@@ -170,7 +170,7 @@ clean_up_file:
 
 bool png_quantize(
     hicolor_version version,
-    bool dither,
+    hicolor_dither dither,
     const char* src,
     const char* dest
 )
@@ -351,7 +351,7 @@ void usage(FILE* output)
     fprintf(
         output,
         "usage:\n"
-        "  hicolor (encode|quantize) [-5|-6] [-n] [--] <src> [<dest>]\n"
+        "  hicolor (encode|quantize) [-5|-6] [-a|-b|-n] [--] <src> [<dest>]\n"
         "  hicolor decode <src> [<dest>]\n"
         "  hicolor info <file>\n"
         "  hicolor (version|help|-h|--help)\n"
@@ -389,7 +389,9 @@ void help()
         "\noptions:\n"
         "  -5, --15-bit     15-bit color\n"
         "  -6, --16-bit     16-bit color\n"
-        "  -n, --no-dither  do not dither the image\n"
+        "  -a, --a-dither   dither image with \"a dither\"\n"
+        "  -b, --bayer      dither image with Bayer algorithm (default)\n"
+        "  -n, --no-dither  do not dither image\n"
     );
 }
 
@@ -413,7 +415,7 @@ typedef enum command {
 int main(int argc, char** argv)
 {
     command opt_command = ENCODE;
-    bool opt_dither = true;
+    hicolor_dither opt_dither = HICOLOR_BAYER;
     hicolor_version opt_version = HICOLOR_VERSION_6;
     const char* command_name;
     char* arg_src;
@@ -489,9 +491,15 @@ int main(int argc, char** argv)
             } else if (strcmp(argv[i], "-6") == 0
                 || strcmp(argv[i], "--16-bit") == 0) {
                 opt_version = HICOLOR_VERSION_6;
+            } else if (strcmp(argv[i], "-a") == 0
+                || strcmp(argv[i], "--a-dither") == 0) {
+                opt_dither = HICOLOR_A_DITHER;
+            } else if (strcmp(argv[i], "-b") == 0
+                || strcmp(argv[i], "--bayer") == 0) {
+                opt_dither = HICOLOR_BAYER;
             } else if (strcmp(argv[i], "-n") == 0
                 || strcmp(argv[i], "--no-dither") == 0) {
-                opt_dither = false;
+                opt_dither = HICOLOR_NO_DITHER;
             } else {
                 fprintf(
                     stderr,

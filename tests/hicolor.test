@@ -139,6 +139,10 @@ tcltest::test encode-2.8 {encode flags} -body {
     hicolor info photo.png.hic
 } -result {5 640 427}
 
+tcltest::test encode-2.9 {} -body {
+    hicolor encode -b -a -n -a -n -a photo.png
+} -result {}
+
 
 tcltest::test encode-3.1 {bad input} -body {
     hicolor encode truncated.png
@@ -151,7 +155,10 @@ tcltest::test encode-3.2 {bad input} -body {
 
 
 hicolor encode --15-bit photo.png photo.hi5
+hicolor encode --15-bit --a-dither photo.png photo-a-dither.hi5
 hicolor encode --16-bit photo.png photo.hi6
+hicolor encode --16-bit --a-dither photo.png photo-a-dither.hi6
+
 
 tcltest::test decode-1.1 {15-bit} -body {
     hicolor decode photo.hi5
@@ -225,7 +232,22 @@ tcltest::test data-integrity-1.1 {roundtrip} -constraints gm -body {
     exec gm compare -metric rmse photo.png temp.png
 } -match regexp -result {Total: 0.0[12]}
 
-tcltest::test data-integrity-2.1 {alpha roundtrip} -constraints gm -body {
+tcltest::test data-integrity-1.2 {roundtrip} -constraints gm -body {
+    hicolor decode photo.hi6 temp.png
+    exec gm compare -metric rmse photo.png temp.png
+} -match regexp -result {Total: 0.0[12]}
+
+tcltest::test data-integrity-2.1 {roundtrip with "a dither"} -constraints gm -body {
+    hicolor decode photo-a-dither.hi5 temp.png
+    exec gm compare -metric rmse photo.png temp.png
+} -match regexp -result {Total: 0.0[12]}
+
+tcltest::test data-integrity-2.2 {roundtrip with "a dither"} -constraints gm -body {
+    hicolor decode photo-a-dither.hi6 temp.png
+    exec gm compare -metric rmse photo.png temp.png
+} -match regexp -result {Total: 0.0[12]}
+
+tcltest::test data-integrity-3.1 {alpha roundtrip} -constraints gm -body {
     hicolor quant alpha.png alpha-q.png
     exec gm compare -metric rmse alpha.png alpha-q.png
 } -match regexp -result {Total: 0.0+ }
