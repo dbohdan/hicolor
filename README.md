@@ -11,11 +11,13 @@ In 16-bit mode green, the color the human eye is generally most sensitive to, ge
 
 I wrote this program because I wanted to create images with the characteristic high-color look, and nothing seemed to support high color.
 It implements its own simple [file format](format.md) and converts between this format and PNG.
-It can also convert normal PNG to normal 32-bit PNG with only high color color values.
+It can also convert normal PNG to normal 32-bit PNG with only high-color color values.
 (This simulates a roundtrip through HiColor without creating a temporary file.)
 To reduce the quantization error (the difference between the original and the high-color pixel),
-HiColor uses the [Bayer ordered dithering](https://bisqwit.iki.fi/story/howto/dither/jy/#StandardOrderedDitheringAlgorithm) algorithm, which historical software and hardware used for dithering in high color modes.
-Dithering can be disabled with a command line flag.
+HiColor defaults to the [Bayer ordered dithering](https://bisqwit.iki.fi/story/howto/dither/jy/#StandardOrderedDitheringAlgorithm) algorithm,
+which historical software and hardware used for dithering in high-color mode.
+It can use [&ldquo;a dither&rdquo;](https://pippin.gimp.org/a_dither/) instead.
+Dithering can be selected or disabled with command-line flags.
 HiColor files have either the extension `.hic` or `.hi5` for 15-bit and `.hi6` for 16-bit respectively.
 
 Quantized images compress better when their originals, so HiColor may serve as a less-lossy alternative to the 256-color [pngquant](https://pngquant.org/).
@@ -34,7 +36,13 @@ Run them through [OptiPNG](http://optipng.sourceforge.net/) or [Oxipng](https://
 
 ### Generation loss
 
-Fixed for Bayer dithering in version 0.3.0.
+With Bayer dithering or no dithering, there is no [generation loss](https://en.wikipedia.org/wiki/Generation_loss) after the initial quantization.
+Using &ldquo;a dither&rdquo; repeatedly on the same image will result in generation loss.
+In tests it converges to zero after 32 or 64 generations
+(in 15-bit and 16-bit mode respectively).
+
+HiColor 0.1.0&ndash;0.2.1 suffered from generation loss with Bayer dithering due to an implementation error.
+It was fixed in version 0.3.0.
 
 ## Usage
 
