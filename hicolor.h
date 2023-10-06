@@ -371,7 +371,7 @@ void hicolor_a_dither_rgb(
     output->b = hicolor_a_dither_channel(rgb.b, x, y, levels);
 }
 
-/* Ordered ("Bayer") dithering. */
+/* Ordered (Bayer) dithering. */
 uint8_t hicolor_bayerize_channel(
     uint8_t intensity,
     double factor,
