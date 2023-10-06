@@ -9,6 +9,15 @@ HiColor is a program for converting images to 15- and 16-bit RGB color,
 the color depth of old display modes known as [&ldquo;high color&rdquo;](https://en.wikipedia.org/wiki/High_color).
 I wrote it because I wanted to create images with the characteristic high-color look.
 
+## Contents
+
+- [Description](#description)
+- [Known bugs and limitations](#known-bugs-and-limitations)
+- [Usage](#usage)
+- [Building](#building)
+- [Alternatives](#alternatives)
+- [License](#license)
+
 ## Description
 
 HiColor reduces images to two-byte 15- or 16-bit color.
