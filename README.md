@@ -138,9 +138,9 @@ MIT.
 
 ### Photos from Unsplash
 
-[Building photo with a plane from Bordeaux](https://unsplash.com/photos/AwtncJT1qKs) (`bordeaux-15bit.png`) by olaf wisser.
+[&ldquo;plane in flight&rdquo;](https://unsplash.com/photos/AwtncJT1qKs) (`bordeaux-15bit.png`) by olaf wisser.
 
-[Portland photo](https://unsplash.com/photos/PWBXQJ7PUkI) (`tests/photo.png`) by Orlova Maria.
+[&ldquo;houses beside trees&rdquo;](https://unsplash.com/photos/PWBXQJ7PUkI) (`tests/photo.png`) by Orlova Maria.
 
 #### License
 
