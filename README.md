@@ -25,12 +25,12 @@ In 15-bit mode images have 5 bits for each of red, green, and blue, with the las
 In 16-bit mode green, the color the human eye is generally most sensitive to, is given 6 bits.
 
 HiColor implements its own simple [file format](format.md) and converts between this format and PNG.
-It can also convert PNG to regular PNG with only high-color color values.
+It can also convert standard PNG to standard PNG with only high-color color values.
 (This simulates a roundtrip through HiColor without creating a temporary file.)
 HiColor files have either the extension `.hic` or `.hi5` for 15-bit and `.hi6` for 16-bit respectively.
 
 By default,
-HiColor applies the [Bayer ordered dithering](https://bisqwit.iki.fi/story/howto/dither/jy/#StandardOrderedDitheringAlgorithm) algorithm
+HiColor applies the [Bayer ordered dithering](https://en.wikipedia.org/wiki/Ordered_dithering) algorithm
 to reduce the quantization error
 (the difference between the original and the high-color pixel).
 Historical software and hardware used it for dithering in high-color modes.
@@ -55,19 +55,19 @@ Run them through [OptiPNG](http://optipng.sourceforge.net/) or [Oxipng](https://
 ### Generation loss
 
 With Bayer dithering or no dithering, there is no [generation loss](https://en.wikipedia.org/wiki/Generation_loss) after the initial quantization.
-Using &ldquo;a dither&rdquo; repeatedly on the same image will result in generation loss.
+Applying &ldquo;a dither&rdquo; repeatedly to the same image will result in generation loss.
 In tests the loss converges to zero after 32 or 64 generations
 (in 15-bit and 16-bit mode respectively).
 
 HiColor 0.1.0&ndash;0.2.1 suffered from generation loss with Bayer dithering due to an implementation error.
-It was fixed in version 0.3.0.
+The error was fixed in version 0.3.0.
 
 ## Usage
 
 HiColor has a Git-style CLI.
 
 The actions `encode` and `decode` convert images between PNG and HiColor's own image format.
-`quantize` round-trips an image through the converter and outputs a regular 32-bit PNG.
+`quantize` round-trips an image through the converter and outputs a standard 32-bit PNG.
 Use it to create high-color images readable by other programs.
 `info` displays information about a HiColor file: version (`5` for 15-bit or `6` for 16), width, and height.
 
