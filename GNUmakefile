@@ -8,8 +8,11 @@ hicolor: cli.c hicolor.h vendor/cute_png.h
 	$(CC) $< -o $@ $(CFLAGS)
 hicolor.exe: cli.c hicolor.h vendor/cute_png.h
 	$(WIN32_CC) $< -o $@ $(CFLAGS)
-clean:
-	-rm -f hicolor hicolor.exe
+clean: clean-no-ext clean-exe
+clean-no-ext:
+	-rm -f hicolor
+clean-exe:
+	-rm -f hicolor.exe
 
 install: install-bin install-include
 install-bin: hicolor
@@ -17,7 +20,7 @@ install-bin: hicolor
 install-include: hicolor.h
 	install -m 0644 $< $(DESTDIR)$(PREFIX)/include
 
-release: clean test
+release: clean-no-ext test
 	cp hicolor hicolor-v"$$(./hicolor version)"-"$$(uname | tr 'A-Z' 'a-z')"-"$$(uname -m)"
 
 test: all
