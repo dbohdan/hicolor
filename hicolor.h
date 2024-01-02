@@ -1,6 +1,6 @@
 /* HiColor image file format encoder/decoder library.
  *
- * Copyright (c) 2021, 2023 D. Bohdan and contributors listed in AUTHORS.
+ * Copyright (c) 2021, 2023-2024 D. Bohdan and contributors listed in AUTHORS.
  * License: MIT.
  *
  * This header file contains both the interface and the implementation for
@@ -19,7 +19,7 @@
 #include <stdio.h>
 
 #define HICOLOR_BAYER_SIZE 8
-#define HICOLOR_LIBRARY_VERSION 500
+#define HICOLOR_LIBRARY_VERSION 501
 
 /* Types. */
 
@@ -378,7 +378,7 @@ uint8_t hicolor_bayerize_channel(
     double step
 )
 {
-    double dithered = ((double) intensity) / 255 + step / 256 * (factor - 63/64);
+    double dithered = ((double) intensity) / 255 + step / 256 * factor;
 
     double levels = 128.0 / step;
     return (uint8_t) (round(dithered * levels) / levels * 255);
