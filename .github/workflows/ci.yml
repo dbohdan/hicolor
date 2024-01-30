@@ -13,9 +13,17 @@ jobs:
     strategy:
       matrix:
         os:
+          - name: freebsd
+            architecture: x86-64
+            version: '13.2'
+            host: ubuntu-latest
           - name: netbsd
             architecture: x86-64
             version: '9.3'
+            host: ubuntu-latest
+          - name: openbsd
+            architecture: x86-64
+            version: '7.4'
             host: ubuntu-latest
     steps:
       - name: Checkout
