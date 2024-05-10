@@ -1,6 +1,6 @@
 #! /usr/bin/env tclsh
 
-package require Tcl 8.6-10
+package require Tcl 8.6 9
 package require tcltest
 
 cd [file dirname [info script]]
