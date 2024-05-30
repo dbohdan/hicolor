@@ -5,7 +5,7 @@ A jet airplane is taking off in the sky.](bordeaux-15bit.png)
 
 *(The image above has 15-bit color.)*
 
-HiColor is a program for converting images to 15- and 16-bit RGB color,
+HiColor is a program and library for converting images to 15- and 16-bit RGB color,
 the color depth of old display modes known as [&ldquo;high color&rdquo;](https://en.wikipedia.org/wiki/High_color).
 I wrote it because I wanted to create images with the characteristic high-color look.
 
@@ -43,9 +43,17 @@ Quantizing a PNG file to PNG preserves transparency (but does not quantize the a
 Conversion to and from the HiColor format does not preserve transparency.
 
 The program is written in C with minimal dependencies and builds as a static binary by default.
-It is known to work on Linux (aarch64, i386, riscv64, x86\_64), FreeBSD, NetBSD, OpenBSD, and Windows 98 Second Edition, 2000 Service Pack 4, XP, 7, and 10.
+It is known to work on Linux (aarch64, i386, riscv64, x86_64), FreeBSD, NetBSD, OpenBSD, and Windows 98 Second Edition, 2000 Service Pack 4, XP, 7, and 10.
 
 ## Known bugs and limitations
+
+### Security
+
+The command-line version of HiColor (but not the library) uses [cute_png](https://github.com/RandyGaul/cute_headers) to read PNG files.
+cute_png is intended for trusted input.
+This means that a maliciously-crafted PNG file could hack the HiColor CLI.
+To be safe, only feed HiColor PNG files you created yourself.
+Recompress PNG files from the Internet with a trusted program.
 
 ### PNG file size
 
@@ -134,7 +142,7 @@ What differentiates HiColor is being a small dedicated tool and embeddable C lib
 
 MIT.
 
-[cute\_png](https://github.com/RandyGaul/cute_headers/) is copyright (c) 2019, 2021-2023 Randy Gaul and is licensed under the zlib license.
+[cute_png](https://github.com/RandyGaul/cute_headers/) is copyright (c) 2019, 2021-2023 Randy Gaul and is licensed under the zlib license.
 
 ### Photos from Unsplash
 
