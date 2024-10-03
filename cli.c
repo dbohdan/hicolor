@@ -25,14 +25,14 @@
 #define HICOLOR_CLI_CMD_VERSION "version"
 #define HICOLOR_CLI_CMD_HELP "help"
 
-const char* libpng_error_msg;
+const char* png_error_msg = "no error recorded";
 
 void libpng_error_handler(
     png_structp png_ptr,
     png_const_charp error_msg
 )
 {
-    libpng_error_msg = error_msg;
+    png_error_msg = error_msg;
     longjmp(png_jmpbuf(png_ptr), 1);
 }
 
@@ -46,24 +46,27 @@ bool load_png(
 {
     FILE* fp = fopen(filename, "rb");
     if (!fp) {
-        fprintf(stderr, HICOLOR_CLI_ERROR "can't open file %s for reading\n", filename);
+        png_error_msg = "failed to open for reading";
         return false;
     }
 
     png_structp png = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, libpng_error_handler, NULL);
-    if (!png) {
+    if (png == NULL) {
+        png_error_msg = "`png_create_read_struct` returned null";
         fclose(fp);
         return false;
     }
 
     png_infop info = png_create_info_struct(png);
-    if (!info) {
+    if (info == NULL) {
+        png_error_msg = "`png_create_info_struct` returned null";
         png_destroy_read_struct(&png, NULL, NULL);
         fclose(fp);
         return false;
     }
 
     if (setjmp(png_jmpbuf(png))) {
+        /* Do not overwrite `png_error_msg` set by the handler. */
         png_destroy_read_struct(&png, &info, NULL);
         fclose(fp);
         return false;
@@ -110,6 +113,7 @@ bool load_png(
     *alpha = malloc(sizeof(uint8_t) * *width * *height);
 
     if (*rgb_img == NULL || *alpha == NULL) {
+        png_error_msg = "failed to allocate memory for `rgb_img` or `alpha`";
         png_destroy_read_struct(&png, &info, NULL);
         fclose(fp);
         return false;
@@ -117,6 +121,7 @@ bool load_png(
 
     png_bytep row = malloc(png_get_rowbytes(png, info));
     if (row == NULL) {
+        png_error_msg = "failed to allocate memory for `row`";
         free(*rgb_img);
         free(*alpha);
         png_destroy_read_struct(&png, &info, NULL);
@@ -153,24 +158,27 @@ bool save_png(
 {
     FILE* fp = fopen(filename, "wb");
     if (!fp) {
-        fprintf(stderr, HICOLOR_CLI_ERROR "can't open file %s for writing\n", filename);
+        png_error_msg = "failed to open for writing";
         return false;
     }
 
     png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, libpng_error_handler, NULL);
-    if (!png) {
+    if (png == NULL) {
+        png_error_msg = "`png_create_write_struct` returned null";
         fclose(fp);
         return false;
     }
 
     png_infop info = png_create_info_struct(png);
-    if (!info) {
+    if (info == NULL) {
+        png_error_msg = "`png_create_info_struct` returned null";
         png_destroy_write_struct(&png, NULL);
         fclose(fp);
         return false;
     }
 
     if (setjmp(png_jmpbuf(png))) {
+        /* Do not overwrite `png_error_msg` set by the handler. */
         png_destroy_write_struct(&png, &info);
         fclose(fp);
         return false;
@@ -194,6 +202,7 @@ bool save_png(
 
     png_bytep row = malloc(png_get_rowbytes(png, info));
     if (row == NULL) {
+        png_error_msg = "failed to allocate memory for `row`";
         png_destroy_write_struct(&png, &info);
         fclose(fp);
         return false;
@@ -276,7 +285,7 @@ bool png_to_hicolor(
             stderr,
             HICOLOR_CLI_ERROR "can't load PNG file \"%s\": %s\n",
             src,
-            libpng_error_msg
+            png_error_msg
         );
         return false;
     }
@@ -348,7 +357,7 @@ bool png_quantize(
             stderr,
             HICOLOR_CLI_ERROR "can't load PNG file \"%s\": %s\n",
             src,
-            libpng_error_msg
+            png_error_msg
         );
         return false;
     }
@@ -366,7 +375,11 @@ bool png_quantize(
     }
 
     if (!save_png(dest, width, height, rgb_img, alpha)) {
-        fprintf(stderr, HICOLOR_CLI_ERROR "can't save PNG\n");
+        fprintf(
+            stderr,
+            HICOLOR_CLI_ERROR "can't save PNG: %s\n",
+            png_error_msg
+        );
         goto clean_up_images;
     }
 
@@ -413,7 +426,11 @@ bool hicolor_to_png(
     }
 
     if (!save_png(dest, meta.width, meta.height, rgb_img, NULL)) {
-        fprintf(stderr, HICOLOR_CLI_ERROR "can't save PNG\n");
+        fprintf(
+            stderr,
+            HICOLOR_CLI_ERROR "can't save PNG: %s\n",
+            png_error_msg
+        );
         goto clean_up_rgb_img;
     }
 
