@@ -1,41 +1,31 @@
 name: CI
 on: [push, pull_request]
 jobs:
-  test-ubuntu:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Install dependencies
-      run: |
-        sudo .github/workflows/install-deps.sh
-    - name: Test
-      run: |
-        gmake test
-
-  test-bsd:
+  bsd:
     runs-on: ${{ matrix.os.host }}
     strategy:
       matrix:
         os:
           - name: freebsd
             architecture: x86-64
-            version: '13.2'
+            version: '14.1'
             host: ubuntu-latest
+
           - name: netbsd
             architecture: x86-64
-            version: '9.3'
+            version: '10.0'
             host: ubuntu-latest
+
           - name: openbsd
             architecture: x86-64
-            version: '7.4'
+            version: '7.5'
             host: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Run CI script on ${{ matrix.os.name }}
-        uses: cross-platform-actions/action@v0.24.0
+        uses: cross-platform-actions/action@v0.25.0
         with:
           operating_system: ${{ matrix.os.name }}
           architecture: ${{ matrix.os.architecture }}
@@ -47,3 +37,58 @@ jobs:
             # See https://github.com/cross-platform-actions/action/issues/75
             sudo .github/workflows/install-deps.sh
             gmake test
+
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo .github/workflows/install-deps.sh
+
+    - name: Test
+      run: |
+        gmake test
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: hicolor-linux-x86_64
+        path: |
+          hicolor
+
+  windows:
+    runs-on: windows-latest
+    steps:
+    - name: 'Disable `autocrlf` in Git'
+      run: git config --global core.autocrlf false
+
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Set up MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        update: true
+        msystem: mingw32
+        install: |
+          make
+          mingw-w64-i686-gcc
+          mingw-w64-i686-libpng
+          mingw-w64-i686-pkgconf
+          mingw-w64-i686-zlib
+          tcl
+
+    - name: Test
+      shell: msys2 {0}
+      run: |
+        make test
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: hicolor-win32
+        path: |
+          hicolor.exe

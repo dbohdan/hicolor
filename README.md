@@ -49,11 +49,9 @@ It is known to work on Linux (aarch64, i386, riscv64, x86_64), FreeBSD, NetBSD, 
 
 ### Security
 
-The command-line version of HiColor (but not the library) uses [cute_png](https://github.com/RandyGaul/cute_headers) to read PNG files.
-cute_png is intended for trusted input.
-This means that a maliciously-crafted PNG file could hack the HiColor CLI.
-To be safe, only feed HiColor PNG files you created yourself.
-Recompress PNG files from the Internet with a trusted program.
+The command-line program (but not the library) was vulnerable to malicious PNG files
+because it used a PNG library intended only for trusted input.
+The vulnerabilities were fixed in version 0.6.0 by switching to libpng.
 
 ### PNG file size
 
@@ -80,7 +78,7 @@ Use it to create high-color images readable by other programs.
 `info` displays information about a HiColor file: version (`5` for 15-bit or `6` for 16), width, and height.
 
 ```none
-HiColor 0.5.0
+HiColor 0.6.0
 Create 15/16-bit color RGB images.
 
 usage:
@@ -94,7 +92,7 @@ commands:
   decode           convert HiColor to PNG
   quantize         quantize PNG to PNG
   info             print HiColor image version and resolution
-  version          print program version
+  version          print version of HiColor, libpng, and zlib
   help             print this help message
 
 options:
@@ -114,16 +112,15 @@ sudo apt install -y build-essential graphicsmagick tclsh
 gmake test
 ```
 
-### Cross-compiling for Windows
+### Windows
 
-The following commands build a 32-bit executable for Windows.
+Install [MSYS2](https://www.msys2.org/).
+Run the following commands in the MSYS2 mingw32 shell
+to build an x86 executable for Windows.
 
 ```sh
-sudo apt install -y build-essential gcc-mingw-w64-i686
-gmake hicolor.exe
-# Wine, Tcl, and GraphicsMagick are needed only for testing.
-sudo apt install -y graphicsmagick tclsh wine
-gmake test-wine
+pacman -Syuu make mingw-w64-i686-gcc mingw-w64-i686-libpng mingw-w64-i686-pkgconf mingw-w64-i686-zlib tcl
+make test
 ```
 
 ## Alternatives
@@ -142,7 +139,8 @@ What differentiates HiColor is being a small dedicated tool and embeddable C lib
 
 MIT.
 
-[cute_png](https://github.com/RandyGaul/cute_headers/) is copyright (c) 2019, 2021-2023 Randy Gaul and is licensed under the zlib license.
+HiColor uses [libpng](http://www.libpng.org/pub/png/libpng.html) and [zlib](https://www.zlib.net/).
+Follow the links for their respective licenses.
 
 ### Photos from Unsplash
 

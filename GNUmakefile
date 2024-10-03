@@ -1,18 +1,21 @@
-WIN32_CC ?= i686-w64-mingw32-gcc
-CFLAGS ?= -g -O3 -static -ffunction-sections -fdata-sections -Wl,--gc-sections -lm -Wall -Wextra
+LIBPNG_CFLAGS ?= $(shell pkg-config --cflags libpng)
+LIBPNG_LIBS ?= $(shell pkg-config --libs libpng)
+ZLIB_CFLAGS ?= $(shell pkg-config --cflags zlib)
+ZLIB_LIBS ?= $(shell pkg-config --libs zlib)
+
+CFLAGS ?= -g -O3 -static -ffunction-sections -fdata-sections -Wl,--gc-sections -Wall -Wextra $(LIBPNG_CFLAGS) $(ZLIB_CFLAGS)
+LIBS ?= $(LIBPNG_LIBS) $(ZLIB_LIBS) -lm
 PREFIX ?= /usr/local
 
 all: hicolor
 
 hicolor: cli.c hicolor.h vendor/cute_png.h
-	$(CC) $< -o $@ $(CFLAGS)
-hicolor.exe: cli.c hicolor.h vendor/cute_png.h
-	$(WIN32_CC) $< -o $@ $(CFLAGS)
+	$(CC) $< -o $@ $(CFLAGS) $(LIBS)
 clean: clean-no-ext clean-exe
-clean-no-ext:
-	-rm -f hicolor
 clean-exe:
 	-rm -f hicolor.exe
+clean-no-ext:
+	-rm -f hicolor
 
 install: install-bin install-include
 install-bin: hicolor
@@ -21,11 +24,9 @@ install-include: hicolor.h
 	install -m 0644 $< $(DESTDIR)$(PREFIX)/include
 
 release: clean-no-ext test
-	cp hicolor hicolor-v"$$(./hicolor version)"-"$$(uname | tr 'A-Z' 'a-z')"-"$$(uname -m)"
+	cp hicolor hicolor-v"$$(./hicolor version | head -n 1 | awk '{ print $$2 }')"-"$$(uname | tr 'A-Z' 'a-z')"-"$$(uname -m)"
 
 test: all
 	tests/hicolor.test
-test-wine: hicolor.exe
-	HICOLOR_COMMAND='wine ../hicolor.exe' WINEDEBUG=-all tests/hicolor.test
 
-.PHONY: all clean install-bin install-include test test-wine
+.PHONY: all clean clean-exe clean-no-ext install install-bin install-include release test

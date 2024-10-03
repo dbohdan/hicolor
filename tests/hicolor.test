@@ -97,7 +97,7 @@ tcltest::test encode-1.5 {} -body {
 
 tcltest::test encode-1.6 {} -body {
     hicolor encode [file tail [info script]]
-} -returnCodes error -match glob -result {*incorrect file signature*}
+} -returnCodes error -match glob -result {*Not a PNG file*}
 
 
 tcltest::test encode-2.1 {encode flags} -body {
@@ -147,7 +147,7 @@ tcltest::test encode-2.9 {} -body {
 tcltest::test encode-3.1 {bad input} -body {
     hicolor encode truncated.png
 } -returnCodes error -result {error: can't load PNG file "truncated.png":\
-    corrupt zlib structure in DEFLATE stream}
+    Read Error}
 
 tcltest::test encode-3.2 {bad input} -body {
     hicolor encode wrong-size.png
@@ -190,12 +190,12 @@ tcltest::test quantize-1.2 {} -body {
 
 tcltest::test quantize-2.1 {bad input} -body {
     hicolor encode [file tail [info script]]
-} -returnCodes error -match glob -result {*incorrect file signature*}
+} -returnCodes error -match glob -result {*Not a PNG file*}
 
 tcltest::test quantize-2.2 {bad input} -body {
     hicolor quantize truncated.png
 } -returnCodes error -result {error: can't load PNG file "truncated.png":\
-    corrupt zlib structure in DEFLATE stream}
+    Read Error}
 
 tcltest::test quantize-2.3 {bad input} -body {
     hicolor quantize wrong-size.png
