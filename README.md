@@ -5,7 +5,7 @@ A jet airplane is taking off in the sky.](bordeaux-15bit.png)
 
 *(The image above has 15-bit color.)*
 
-HiColor is a program and library for converting images to 15- and 16-bit RGB color,
+HiColor is a program and a C library for converting images to 15- and 16-bit RGB color,
 the color depth of old display modes known as [&ldquo;high color&rdquo;](https://en.wikipedia.org/wiki/High_color).
 I wrote it because I wanted to create images with the characteristic high-color look.
 
@@ -42,8 +42,22 @@ so HiColor can be a less-lossy alternative to the 256-color [pngquant](https://p
 Quantizing a PNG file to PNG preserves transparency (but does not quantize the alpha channel).
 Conversion to and from the HiColor format does not preserve transparency.
 
-The program is written in C with minimal dependencies and builds as a static binary by default.
-It is known to work on Linux (aarch64, i386, riscv64, x86_64), FreeBSD, NetBSD, OpenBSD, and Windows 98 Second Edition, 2000 Service Pack 4, XP, 7, and 10.
+The program is written in C with two external dependencies, libpng and zlib, and builds as a static binary.
+It is known to work on
+Linux (aarch64, i386, riscv64, x86_64),
+FreeBSD,
+NetBSD,
+OpenBSD,
+and Windows 98 Second Edition,
+2000 Service Pack 4,
+XP,
+7,
+and 10.
+
+The library is a single C99 header file.
+It is designed to be easy to understand and modify
+at a cost to performance.
+The design makes it unsuitable for real-time graphics.
 
 ## Known bugs and limitations
 
@@ -55,7 +69,7 @@ The vulnerabilities were fixed in version 0.6.0 by switching to libpng.
 
 ### PNG file size
 
-PNG files produced by HiColor are not optimized.
+PNG files produced by HiColor are not highly optimized.
 Run them through [OptiPNG](http://optipng.sourceforge.net/) or [Oxipng](https://github.com/shssoichiro/oxipng) to significantly reduce their size.
 
 ### Generation loss
@@ -74,8 +88,8 @@ HiColor has a Git-style CLI.
 
 The actions `encode` and `decode` convert images between PNG and HiColor's own image format.
 `quantize` round-trips an image through the converter and outputs a standard 32-bit PNG.
-Use it to create high-color images readable by other programs.
-`info` displays information about a HiColor file: version (`5` for 15-bit or `6` for 16), width, and height.
+Use `quantize` to create high-color images readable by other programs.
+`info` prints information about a HiColor file: version (`5` for 15-bit or `6` for 16), width, and height.
 
 ```none
 HiColor 0.6.0
@@ -108,7 +122,31 @@ options:
 ### Debian/Ubuntu
 
 ```sh
-sudo apt install -y build-essential graphicsmagick tclsh
+sudo apt install -y build-essential graphicsmagick linpng-dev tclsh zlib1g-dev
+gmake test
+```
+
+### FreeBSD
+
+```sh
+sudo pkg install -y gmake GraphicsMagick pkgconf png tcl86
+ln -s /usr/local/bin/tclsh8.6 /usr/local/bin/tclsh
+fi
+gmake test
+```
+
+### NetBSD
+
+```sh
+sudo pkgin -y install gmake GraphicsMagick pkgconf png tcl zlib
+gmake test
+```
+
+### OpenBSD
+
+```sh
+doas pkg_add -I gmake GraphicsMagick pkgconf png tcl%8.6
+ln -s /usr/local/bin/tclsh8.6 /usr/local/bin/tclsh
 gmake test
 ```
 
@@ -116,7 +154,8 @@ gmake test
 
 Install [MSYS2](https://www.msys2.org/).
 Run the following commands in the MSYS2 mingw32 shell
-to build an x86 executable for Windows.
+in a clone of the HiColor repository.
+This will build an x86 executable for Windows.
 
 ```sh
 pacman -Syuu make mingw-w64-i686-gcc mingw-w64-i686-libpng mingw-w64-i686-pkgconf mingw-w64-i686-zlib tcl
@@ -126,7 +165,6 @@ make test
 ## Alternatives
 
 I wrote HiColor because nothing seemed to support high color.
-I was wrong about that.
 Actually,
 [FFmpeg](https://www.madox.net/blog/2011/06/06/converting-tofrom-rgb565-in-ubuntu-using-ffmpeg/),
 [GIMP](https://docs.gimp.org/2.10/en/gimp-filter-dither.html),

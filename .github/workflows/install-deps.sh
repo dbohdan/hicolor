@@ -6,15 +6,15 @@ if [ "$(uname)" = Linux ]; then
 fi
 
 if [ "$(uname)" = FreeBSD ]; then
-    pkg install -y gmake GraphicsMagick png pkgconf tcl86
+    pkg install -y gmake GraphicsMagick pkgconf png tcl86
     ln -s /usr/local/bin/tclsh8.6 /usr/local/bin/tclsh
 fi
 
 if [ "$(uname)" = NetBSD ]; then
-        pkgin -y install gmake GraphicsMagick png pkgconf tcl zlib
+    pkgin -y install gmake GraphicsMagick pkgconf png tcl zlib
 fi
 
 if [ "$(uname)" = OpenBSD ]; then
-    pkg_add -I gmake GraphicsMagick png pkgconf tcl%8.6
+    pkg_add -I gmake GraphicsMagick pkgconf png tcl%8.6
     ln -s /usr/local/bin/tclsh8.6 /usr/local/bin/tclsh
 fi
