@@ -9,7 +9,7 @@ LIBPNG_LIBS ?= $(shell pkg-config --libs libpng)
 ZLIB_CFLAGS ?= $(shell pkg-config --cflags zlib)
 ZLIB_LIBS ?= $(shell pkg-config --libs zlib)
 
-CFLAGS ?= -g -O3 $(PLATFORM_CFLAGS) -ffunction-sections -fdata-sections -Wall -Wextra $(LIBPNG_CFLAGS) $(ZLIB_CFLAGS)
+CFLAGS ?= -std=c99 -g -O3 $(PLATFORM_CFLAGS) -ffunction-sections -fdata-sections -Wall -Wextra $(LIBPNG_CFLAGS) $(ZLIB_CFLAGS)
 LIBS ?= $(LIBPNG_LIBS) $(ZLIB_LIBS) -lm
 PREFIX ?= /usr/local
 
@@ -17,6 +17,7 @@ all: hicolor
 
 hicolor: cli.c hicolor.h
 	$(CC) $< -o $@ $(CFLAGS) $(LIBS)
+
 clean: clean-no-ext clean-exe
 clean-exe:
 	-rm -f hicolor.exe
