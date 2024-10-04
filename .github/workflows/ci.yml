@@ -59,6 +59,32 @@ jobs:
         path: |
           hicolor
 
+  mac:
+    runs-on: macos-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        .github/workflows/install-deps.sh
+
+    - name: Build and test
+      run: |
+        make test
+
+    - name: Bundle dynamic libraries
+      run: |
+        dylibbundler --bundle-deps --create-dir --fix-file hicolor
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: hicolor-macos-arm64
+        path: |
+          hicolor
+          libs/
+
   windows:
     runs-on: windows-latest
     steps:

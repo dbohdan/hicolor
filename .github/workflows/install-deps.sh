@@ -1,6 +1,10 @@
 #! /bin/sh
 set -e
 
+if [ "$(uname)" = Darwin ]; then
+    brew install dylibbundler tcl-tk
+fi
+
 if [ "$(uname)" = Linux ]; then
     apt-get install -y graphicsmagick pkgconf
 fi

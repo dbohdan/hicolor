@@ -1,9 +1,15 @@
+PLATFORM ?= $(shell uname)
+
+ifneq ($(PLATFORM), Darwin)
+    PLATFORM_CFLAGS ?= -static -Wl,--gc-sections
+endif
+
 LIBPNG_CFLAGS ?= $(shell pkg-config --cflags libpng)
 LIBPNG_LIBS ?= $(shell pkg-config --libs libpng)
 ZLIB_CFLAGS ?= $(shell pkg-config --cflags zlib)
 ZLIB_LIBS ?= $(shell pkg-config --libs zlib)
 
-CFLAGS ?= -g -O3 -static -ffunction-sections -fdata-sections -Wl,--gc-sections -Wall -Wextra $(LIBPNG_CFLAGS) $(ZLIB_CFLAGS)
+CFLAGS ?= -g -O3 $(PLATFORM_CFLAGS) -ffunction-sections -fdata-sections -Wall -Wextra $(LIBPNG_CFLAGS) $(ZLIB_CFLAGS)
 LIBS ?= $(LIBPNG_LIBS) $(ZLIB_LIBS) -lm
 PREFIX ?= /usr/local
 

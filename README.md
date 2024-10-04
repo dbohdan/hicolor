@@ -135,6 +135,16 @@ fi
 gmake test
 ```
 
+### macOS
+
+Install [Homebrew](https://brew.sh/).
+Run the following commands in a clone of the HiColor repository.
+
+```sh
+brew install libpng tcl-tk
+make test
+```
+
 ### NetBSD
 
 ```sh
