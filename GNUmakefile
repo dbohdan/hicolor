@@ -15,7 +15,7 @@ PREFIX ?= /usr/local
 
 all: hicolor
 
-hicolor: cli.c hicolor.h vendor/cute_png.h
+hicolor: cli.c hicolor.h
 	$(CC) $< -o $@ $(CFLAGS) $(LIBS)
 clean: clean-no-ext clean-exe
 clean-exe:
