@@ -122,7 +122,7 @@ options:
 ### Debian/Ubuntu
 
 ```sh
-sudo apt install -y build-essential graphicsmagick linpng-dev tclsh zlib1g-dev
+sudo apt install -y build-essential graphicsmagick linpng-dev pkgconf tclsh zlib1g-dev
 gmake test
 ```
 
