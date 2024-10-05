@@ -16,6 +16,7 @@
 
 #define HICOLOR_CLI_ERROR "error: "
 #define HICOLOR_CLI_LIB_NAME_FORMAT "%-9s"
+#define HICOLOR_CLI_LIBPNG_COMPRESSION_LEVEL 6
 #define HICOLOR_CLI_NO_MEMORY_EXIT_CODE 255
 
 #define HICOLOR_CLI_CMD_ENCODE "encode"
@@ -197,7 +198,7 @@ bool save_png(
         PNG_COMPRESSION_TYPE_DEFAULT,
         PNG_FILTER_TYPE_DEFAULT
     );
-    png_set_compression_level(png, 9);
+    png_set_compression_level(png, HICOLOR_CLI_LIBPNG_COMPRESSION_LEVEL);
     png_write_info(png, info);
 
     png_bytep row = malloc(png_get_rowbytes(png, info));
