@@ -92,7 +92,7 @@ Use `quantize` to create high-color images readable by other programs.
 `info` prints information about a HiColor file: version (`5` for 15-bit or `6` for 16), width, and height.
 
 ```none
-HiColor 0.6.1
+HiColor 1.0.0
 Create 15/16-bit color RGB images.
 
 usage:
