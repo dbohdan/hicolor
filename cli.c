@@ -658,12 +658,12 @@ int main(
         max_pos_args = 0;
         opt_command = HELP;
     } else {
+        usage(stderr);
         fprintf(
             stderr,
             HICOLOR_CLI_ERROR "unknown command \"%s\"\n",
             argv[i]
         );
-        usage(stderr);
         return 1;
     }
 
@@ -690,12 +690,12 @@ int main(
                 || strcmp(argv[i], "--no-dither") == 0) {
                 opt_dither = HICOLOR_NO_DITHER;
             } else {
+                usage(stderr);
                 fprintf(
                     stderr,
                     HICOLOR_CLI_ERROR "unknown option \"%s\"\n",
                     argv[i]
                 );
-                usage(stderr);
                 return 1;
             }
 
@@ -706,22 +706,22 @@ int main(
     int rem_args = argc - i;
 
     if (rem_args < min_pos_args) {
+        usage(stderr);
         fprintf(
             stderr,
             HICOLOR_CLI_ERROR "no source image given to command \"%s\"\n",
             command_name
         );
-        usage(stderr);
         return 1;
     }
 
     if (rem_args > max_pos_args) {
+        usage(stderr);
         fprintf(
             stderr,
             HICOLOR_CLI_ERROR "too many arguments to command \"%s\"\n",
             command_name
         );
-        usage(stderr);
         return 1;
     }
 
