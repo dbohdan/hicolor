@@ -661,7 +661,7 @@ int main(
         usage(stderr);
         fprintf(
             stderr,
-            HICOLOR_CLI_ERROR "unknown command \"%s\"\n",
+            "\n" HICOLOR_CLI_ERROR "unknown command \"%s\"\n",
             argv[i]
         );
         return 1;
@@ -693,7 +693,7 @@ int main(
                 usage(stderr);
                 fprintf(
                     stderr,
-                    HICOLOR_CLI_ERROR "unknown option \"%s\"\n",
+                    "\n" HICOLOR_CLI_ERROR "unknown option \"%s\"\n",
                     argv[i]
                 );
                 return 1;
@@ -709,7 +709,7 @@ int main(
         usage(stderr);
         fprintf(
             stderr,
-            HICOLOR_CLI_ERROR "no source image given to command \"%s\"\n",
+            "\n" HICOLOR_CLI_ERROR "no source image given to command \"%s\"\n",
             command_name
         );
         return 1;
@@ -719,7 +719,7 @@ int main(
         usage(stderr);
         fprintf(
             stderr,
-            HICOLOR_CLI_ERROR "too many arguments to command \"%s\"\n",
+            "\n" HICOLOR_CLI_ERROR "too many arguments to command \"%s\"\n",
             command_name
         );
         return 1;
