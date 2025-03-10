@@ -1,6 +1,6 @@
 /* HiColor image file format encoder/decoder library.
  *
- * Copyright (c) 2021, 2023-2024 D. Bohdan and contributors listed in AUTHORS.
+ * Copyright (c) 2021, 2023-2025 D. Bohdan and contributors listed in AUTHORS.
  * License: MIT.
  *
  * This header file contains both the interface and the implementation for
@@ -19,7 +19,7 @@
 #include <stdio.h>
 
 #define HICOLOR_BAYER_SIZE 8
-#define HICOLOR_LIBRARY_VERSION 10000
+#define HICOLOR_LIBRARY_VERSION 10001
 
 /* Types. */
 
@@ -75,7 +75,8 @@ static const uint8_t hicolor_64_to_256[] = {
 };
 
 /* The values in this array are the output of
- * `scripts/bayer-matrix.tcl`. */
+ * `scripts/bayer-matrix.tcl`.
+ */
 static const double hicolor_bayer[HICOLOR_BAYER_SIZE * HICOLOR_BAYER_SIZE] = {
      0.0/64, 48.0/64, 12.0/64, 60.0/64,  3.0/64, 51.0/64, 15.0/64, 63.0/64,
     32.0/64, 16.0/64, 44.0/64, 28.0/64, 35.0/64, 19.0/64, 47.0/64, 31.0/64,
@@ -341,7 +342,8 @@ hicolor_result hicolor_write_header(
 
 /* "a dither" is a public-domain dithering algorithm by Øyvind Kolås.
  * This function implements pattern 3.
- * https://pippin.gimp.org/a_dither/ */
+ * https://pippin.gimp.org/a_dither/
+ */
 uint8_t hicolor_a_dither_channel(
     uint8_t intensity,
     uint16_t x,
@@ -352,7 +354,12 @@ uint8_t hicolor_a_dither_channel(
     double mask = (double) ((x + y * 237) * 119 & 255) / 255.0;
     double normalized = (double) intensity / 255.0;
     double dithered_normalized = floor(levels * normalized + mask) / levels;
-    return (uint8_t) (dithered_normalized * 255);
+    if (dithered_normalized > 1) {
+        dithered_normalized = 1;
+    }
+
+    uint8_t result = dithered_normalized * 255;
+    return result;
 }
 
 void hicolor_a_dither_rgb(
