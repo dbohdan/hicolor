@@ -6,7 +6,7 @@ if [ "$(uname)" = Darwin ]; then
 fi
 
 if [ "$(uname)" = Linux ]; then
-    apt-get install -y graphicsmagick pkgconf
+    apt-get install -y graphicsmagick libpng-dev pkgconf
 fi
 
 if [ "$(uname)" = FreeBSD ]; then
